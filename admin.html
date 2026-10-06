@@ -208,6 +208,15 @@ tr:hover td{background:#fafbff}
   </div>
 </div>
 
+<div class="modal-shade" id="confirmModal">
+  <div class="modal" style="max-width:420px;text-align:center">
+    <h2 style="font-size:18px" id="confirmMsg"></h2>
+    <div class="mclose" style="justify-content:center">
+      <button class="btn btn-sec" id="confirmNo" type="button">Nahi</button>
+      <button class="btn btn-pri" id="confirmYes" type="button">Haan, Karo</button>
+    </div>
+  </div>
+</div>
 <div class="toast" id="toast"></div>
 
 
@@ -232,6 +241,16 @@ const db = firebase.firestore();
 const $ = id => document.getElementById(id);
 const money = n => n == null ? "—" : "₹" + Number(n).toLocaleString("en-IN");
 function toast(msg){ const t=$("toast"); t.textContent=msg; t.classList.add("show"); setTimeout(()=>t.classList.remove("show"),2600); }
+function confirmDlg(msg){
+  return new Promise(res => {
+    $("confirmMsg").textContent = msg;
+    $("confirmModal").classList.add("open");
+    const done = v => { $("confirmModal").classList.remove("open");
+      $("confirmYes").onclick = $("confirmNo").onclick = null; res(v); };
+    $("confirmYes").onclick = () => done(true);
+    $("confirmNo").onclick = () => done(false);
+  });
+}
 const sellPrice = sup => sup == null || sup === "" ? null : Math.round(Number(sup) * (1 + MARGIN));
 
 /* ============ AUTH ============ */
@@ -329,7 +348,7 @@ $("prodSearch").oninput = e => renderProducts(e.target.value);
 
 async function delProduct(id){
   const p = products.find(x => x.id === id);
-  if (!confirm(`"${p.name}" delete karna hai? Pakka?`)) return;
+  if (!(await confirmDlg(`"${p.name}" delete karna hai? Pakka?`))) return;
   await db.collection("products").doc(id).delete();
   toast("🗑️ Delete ho gaya");
   loadProducts();
@@ -404,7 +423,7 @@ function renderCategories(){
       <td><div class="rowbtns"><button data-cdel="${c.id}" class="del" type="button">Delete</button></div></td></tr>`;
   }).join("") : `<tr><td colspan="3" class="empty">Koi category nahi. Upar se add karo.</td></tr>`;
   document.querySelectorAll("[data-cdel]").forEach(b => b.onclick = async () => {
-    if (!confirm("Category delete karna hai?")) return;
+    if (!(await confirmDlg("Category delete karna hai?"))) return;
     await db.collection("categories").doc(b.dataset.cdel).delete();
     toast("🗑️ Category delete");
     loadCategories();
@@ -449,7 +468,7 @@ function readCSV(file){
 $("csvCancelBtn").onclick = () => { csvData = []; $("csvPreview").hidden = true; $("csvFile").value = ""; };
 $("csvImportBtn").onclick = async () => {
   if (!csvData.length) return;
-  if (!confirm(csvData.length + " products import karne hain? Pakka?")) return;
+  if (!(await confirmDlg(csvData.length + " products import karne hain? Pakka?"))) return;
   $("csvImportBtn").disabled = true;
   $("csvImportBtn").textContent = "Import ho raha hai...";
   try {
@@ -476,7 +495,7 @@ const SEED_PRODUCTS = [{"name": "रंगीन परदा लाइट", "na
 
 $("seedBtn").onclick = async () => {
   if (products.length > 0) { toast("⚠️ Database me pehle se products hain!"); return; }
-  if (!confirm("77 maujooda products database me import karne hain?")) return;
+  if (!(await confirmDlg("77 maujooda products database me import karne hain?"))) return;
   $("seedBtn").disabled = true;
   $("seedBtn").textContent = "Import ho raha hai...";
   try {
