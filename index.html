@@ -556,7 +556,7 @@ document.getElementById('verifySms').onclick=()=>{const c=uiCopy[currentLang];co
   // web app register karo, authorized domain me tiharbazaar.github.io add karo, phir neeche config bharo.
   // Jab tak config placeholder hai, buttons imaandaari se "setup pending" batayenge.
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-  import { getAuth, GoogleAuthProvider, FacebookAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, sendPasswordResetEmail, RecaptchaVerifier, signInWithPhoneNumber, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+  import { getAuth, GoogleAuthProvider, FacebookAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, sendPasswordResetEmail, RecaptchaVerifier, signInWithPhoneNumber, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
   const firebaseConfig = {
     apiKey: "AIzaSyCZjMeOhvKqh1xPmtJSdW9fH7ucWu4Wxfk",
     authDomain: "tihar-bazaar.firebaseapp.com",
@@ -592,12 +592,19 @@ document.getElementById('verifySms').onclick=()=>{const c=uiCopy[currentLang];co
     try {
       auth = getAuth(initializeApp(firebaseConfig));
       onAuthStateChanged(auth, u => { user = u || null; paintLabel(); });
+      getRedirectResult(auth).then(res => { if (res && res.user && window.tiharCloseAuth) window.tiharCloseAuth(); }).catch(() => {});
     } catch (e) { auth = null; }
+  }
+  const isMobileAuth = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent || '');
+  async function socialFlow(mkProvider) {
+    const provider = mkProvider();
+    if (isMobileAuth) { await signInWithRedirect(auth, provider); return; }
+    await signInWithPopup(auth, provider);
   }
   window.tiharAuth = {
     ready: READY,
-    google() { return needAuth(() => signInWithPopup(auth, new GoogleAuthProvider())); },
-    facebook() { return needAuth(() => signInWithPopup(auth, new FacebookAuthProvider())); },
+    google() { return needAuth(() => socialFlow(() => new GoogleAuthProvider())); },
+    facebook() { return needAuth(() => socialFlow(() => new FacebookAuthProvider())); },
     emailLogin(email, pw) { return needAuth(() => signInWithEmailAndPassword(auth, email, pw)); },
     emailSignup(name, email, pw) { return needAuth(() => createUserWithEmailAndPassword(auth, email, pw).then(cred => updateProfile(cred.user, { displayName: name }).then(() => cred))); },
     forgot(email) { return needAuth(() => sendPasswordResetEmail(auth, email)); },
