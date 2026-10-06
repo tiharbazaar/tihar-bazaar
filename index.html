@@ -558,10 +558,12 @@ document.getElementById('verifySms').onclick=()=>{const c=uiCopy[currentLang];co
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
   import { getAuth, GoogleAuthProvider, FacebookAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, sendPasswordResetEmail, RecaptchaVerifier, signInWithPhoneNumber, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
   const firebaseConfig = {
-    apiKey: "REPLACE_WITH_API_KEY",
-    authDomain: "REPLACE_WITH_PROJECT_ID.firebaseapp.com",
-    projectId: "REPLACE_WITH_PROJECT_ID",
-    appId: "REPLACE_WITH_APP_ID"
+    apiKey: "AIzaSyCZjMeOhvKqh1xPmtJSdW9fH7ucWu4Wxfk",
+    authDomain: "tihar-bazaar.firebaseapp.com",
+    projectId: "tihar-bazaar",
+    storageBucket: "tihar-bazaar.firebasestorage.app",
+    messagingSenderId: "971542486073",
+    appId: "1:971542486073:web:9d26231c4e0706e3cac1e8"
   };
   const READY = firebaseConfig.apiKey.indexOf('REPLACE_WITH') !== 0;
   const lang = () => (window.tiharLang ? window.tiharLang() : 'hi');
