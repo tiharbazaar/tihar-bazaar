@@ -574,7 +574,7 @@
         if(typeof window.tiharGetOrder!=='function')throw new Error('x');
         const o=await window.tiharGetOrder(id);
         box.innerHTML=o?orderCardHtml(o):`<div class="orders-empty">${c.orderNotFound}</div>`;
-      }catch(e){box.innerHTML=`<div class="orders-empty">${c.orderFail}</div>`;}
+      }catch(e){box.innerHTML=`<div class="orders-empty">${c.orderNotFound}</div>`;}
     }
     async function renderMyOrdersTab(){
       const c=uiCopy[currentLang],box=document.getElementById('ordersBody');
@@ -704,7 +704,7 @@ document.getElementById('verifySms').onclick=()=>{const c=uiCopy[currentLang];co
   const t = () => T[lang()] || T.hi;
   const statusEls = () => ['loginStatus', 'signupStatus'].map(id => document.getElementById(id)).filter(Boolean);
   const setStatus = m => statusEls().forEach(el => { el.textContent = m; el.classList.remove('ok'); });
-  let auth = null, user = null, defaultLabel = '', recaptchaVerifier = null, smsConfirmation = null;
+  let auth = null, user = null, defaultLabel = '', recaptchaVerifier = null, smsConfirmation = null, fsDb = null;
   const labelEl = () => document.getElementById('accountLabel');
   function paintLabel() {
     const el = labelEl(); if (!el) return;
@@ -721,7 +721,7 @@ document.getElementById('verifySms').onclick=()=>{const c=uiCopy[currentLang];co
     try {
       auth = getAuth(initializeApp(firebaseConfig));
       try {
-        const fsDb = getFirestore();
+        fsDb = getFirestore();
         window.tiharFetchStore = async function(){
           const [pSnap, cSnap] = await Promise.all([
             getDocs(collection(fsDb, 'products')),
