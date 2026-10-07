@@ -346,8 +346,10 @@
       try{ if(!list.some(c=>c[0]===selectedCat)) selectedCat='सभी'; }catch(e){}
     }
     async function loadStoreData(){
-      storeLoading=true; storeError=false;
+      storeLoading=true; storeError=false; render();
       try{
+        let waited=0;
+        while(typeof window.tiharFetchStore!=='function'&&waited<60){ await new Promise(r=>setTimeout(r,250)); waited++; }
         if(typeof window.tiharFetchStore!=='function') throw new Error('no-store');
         const data=await window.tiharFetchStore();
         products=data.products.map(normalizeProduct).filter(pr=>pr.stock!=='out_of_stock');
