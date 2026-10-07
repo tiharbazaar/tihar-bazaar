@@ -554,7 +554,7 @@ function renderOrders(){
     return `<tr>
       <td><b>${o.orderId||o._id}</b></td>
       <td style="white-space:nowrap">${fmtDate(o.createdAt)}</td>
-      <td>${o.customerName||"–"}<br><small style="color:var(--muted)">${o.customerPhone||""}</small></td>
+      <td>${esc(o.customerName)||"–"}<br><small style="color:var(--muted)">${esc(o.customerPhone)}</small></td>
       <td style="max-width:220px"><small>${items||"–"}</small></td>
       <td><b>₹${o.subtotal!=null?o.subtotal:"?"}</b></td>
       <td>${payCellHtml(o)}</td>
@@ -595,14 +595,14 @@ function showOrderDetail(docId){
   document.getElementById("orderModalTitle").textContent = o.orderId || "Order";
   const items = (o.items||[]).map(it => `<div class="ord-item"><span>${it.name||"#"+it.id} × ${it.qty||1}</span><span>${it.price!=null?"₹"+(it.price*(it.qty||1)):"price puchho"}</span></div>`).join("");
   document.getElementById("orderDetailBody").innerHTML = `
-    <div><b>Customer:</b> ${o.customerName||"–"}</div>
-    <div><b>Phone:</b> ${o.customerPhone||"–"}</div>
-    <div><b>Address:</b> ${o.customerAddress||"–"}</div>
-    ${o.notes?`<div><b>Note:</b> ${o.notes}</div>`:""}
+    <div><b>Customer:</b> ${esc(o.customerName)||"–"}</div>
+    <div><b>Phone:</b> ${esc(o.customerPhone)||"–"}</div>
+    <div><b>Address:</b> ${esc(o.customerAddress)||"–"}</div>
+    ${o.notes?`<div><b>Note:</b> ${esc(o.notes)}</div>`:""}
     <div><b>Date:</b> ${fmtDate(o.createdAt)}</div>
     <div><b>Payment:</b> ${o.paymentMethod==="esewa"?"📱 eSewa":o.paymentMethod==="khalti"?"💜 Khalti":"💵 Cash on Delivery"}
       ${o.paymentMethod!=="cod"?` <span class="status-pill ${o.paymentStatus==="verified"?"st-delivered":"st-pending"}">${o.paymentStatus==="verified"?"✓ Verified":"⏳ Unverified"}</span>`:""}</div>
-    ${o.paymentRef?`<div><b>Transaction Ref:</b> ${o.paymentRef}</div>`:""}
+    ${o.paymentRef?`<div><b>Transaction Ref:</b> ${esc(o.paymentRef)}</div>`:""}
     <div><b>Status:</b> <span class="status-pill st-${o.status||"pending"}">${STATUS_HI[o.status]||o.status}</span></div>
     <div class="ord-items">${items||"<div class='ord-item'>Koi item nahi</div>"}</div>
     <div style="text-align:right;font-size:17px"><b>Total: ₹${o.subtotal!=null?o.subtotal:"?"}</b></div>`;
