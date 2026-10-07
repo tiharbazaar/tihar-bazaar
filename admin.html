@@ -123,6 +123,7 @@ tr:hover td{background:#fafbff}
       <button class="navbtn" data-view="products" type="button">📦 <span>Products</span></button>
       <button class="navbtn" data-view="categories" type="button">🗂️ <span>Categories</span></button>
       <button class="navbtn" data-view="orders" type="button">🧾 <span>Orders</span></button>
+      <button class="navbtn" data-view="settings" type="button">⚙️ <span>Settings</span></button>
       <button class="navbtn" data-view="import" type="button">📥 <span>Import</span></button>
     </nav>
     <div class="who"><div id="adminEmail"></div><button id="logoutBtn" type="button">Logout</button></div>
@@ -166,6 +167,16 @@ tr:hover td{background:#fafbff}
         <tbody id="catRows"><tr><td colspan="3" class="empty">Loading...</td></tr></tbody>
       </table></div>
     </section>
+    <!-- SETTINGS -->
+    <section class="view" id="view-settings">
+      <h1>Settings</h1><div class="sub">Payment IDs — ग्राहक इन्हीं पर पेमेंट भेजेंगे</div>
+      <div style="max-width:480px">
+        <div class="frow" style="margin-bottom:14px"><label>📱 eSewa ID / Number</label><input id="setEsewa" type="text" placeholder="eSewa ID ya mobile number" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:8px"></div>
+        <div class="frow" style="margin-bottom:14px"><label>💜 Khalti ID / Number</label><input id="setKhalti" type="text" placeholder="Khalti ID ya mobile number" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:8px"></div>
+        <button class="btn btn-pri" id="saveSettings" type="button">💾 Save Karo</button>
+        <p class="hint" style="margin-top:10px">Khali chhodo to customer ko WhatsApp par details lene ko kaha jayega.</p>
+      </div>
+    </section>
     <!-- ORDERS -->
     <section class="view" id="view-orders">
       <h1>Orders</h1><div class="sub">Grahak orders — status update karo</div>
@@ -174,8 +185,8 @@ tr:hover td{background:#fafbff}
         <button class="btn" id="refreshOrders" type="button">🔄 Refresh</button>
       </div>
       <div class="tblwrap"><table>
-        <thead><tr><th>Order ID</th><th>Date</th><th>Customer</th><th>Items</th><th>Total</th><th>Status</th><th></th></tr></thead>
-        <tbody id="orderRows"><tr><td colspan="7" class="empty">Loading...</td></tr></tbody>
+        <thead><tr><th>Order ID</th><th>Date</th><th>Customer</th><th>Items</th><th>Total</th><th>Payment</th><th>Status</th><th></th></tr></thead>
+        <tbody id="orderRows"><tr><td colspan="8" class="empty">Loading...</td></tr></tbody>
       </table></div>
     </section>
     <!-- IMPORT -->
@@ -248,6 +259,7 @@ tr:hover td{background:#fafbff}
     <h2 id="orderModalTitle">Order</h2>
     <div class="ord-detail" id="orderDetailBody"></div>
     <div style="display:flex;gap:10px;margin-top:18px;justify-content:flex-end">
+      <button class="btn btn-pri" id="verifyPayBtn" type="button" style="display:none">✓ Payment Verify Karo</button>
       <button class="btn" id="orderModalClose" type="button">Band karo</button>
     </div>
   </div>
@@ -327,10 +339,34 @@ async function boot(){
   await loadProducts();
   renderDashboard();
   await loadOrders();
+  await loadPaySettings();
+  document.getElementById("saveSettings").onclick = savePaySettings;
   document.getElementById("orderFilter").onchange = renderOrders;
   document.getElementById("refreshOrders").onclick = loadOrders;
   document.getElementById("orderModalClose").onclick = () => document.getElementById("orderModal").classList.remove("open");
   document.getElementById("orderModal").addEventListener("click", e => { if (e.target.id === "orderModal") e.target.classList.remove("open"); });
+}
+
+/* ============ PAYMENT SETTINGS ============ */
+async function loadPaySettings(){
+  try {
+    const d = await db.collection("settings").doc("payments").get();
+    if(d.exists){
+      const s = d.data();
+      document.getElementById("setEsewa").value = s.esewaId || "";
+      document.getElementById("setKhalti").value = s.khaltiId || "";
+    }
+  } catch(e){}
+}
+async function savePaySettings(){
+  try {
+    await db.collection("settings").doc("payments").set({
+      esewaId: document.getElementById("setEsewa").value.trim(),
+      khaltiId: document.getElementById("setKhalti").value.trim(),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+    toast("✅ Payment settings save ho gayi");
+  } catch(e){ toast("❌ Save nahi hua"); }
 }
 
 /* ============ ORDERS ============ */
@@ -358,11 +394,19 @@ function fmtDate(ts){
   } catch(e){ return "–"; }
 }
 
+function payCellHtml(o){
+  const m = o.paymentMethod || "cod";
+  const name = m === "esewa" ? "📱 eSewa" : m === "khalti" ? "💜 Khalti" : "💵 COD";
+  let st = "";
+  if(m !== "cod") st = o.paymentStatus === "verified" ? '<br><span class="status-pill st-delivered">✓ Verified</span>' : '<br><span class="status-pill st-pending">⏳ Unverified</span>';
+  const ref = o.paymentRef ? `<br><small style="color:var(--muted)">Ref: ${o.paymentRef}</small>` : "";
+  return name + st + ref;
+}
 function renderOrders(){
   const f = document.getElementById("orderFilter").value;
   const list = orders.filter(o => f === "all" || o.status === f);
   const tb = document.getElementById("orderRows");
-  if(!list.length){ tb.innerHTML = '<tr><td colspan="7" class="empty">Koi order nahi mila.</td></tr>'; return; }
+  if(!list.length){ tb.innerHTML = '<tr><td colspan="8" class="empty">Koi order nahi mila.</td></tr>'; return; }
   tb.innerHTML = list.map(o => {
     const items = (o.items || []).map(it => `${it.name||"#"+it.id} × ${it.qty||1}`).join(", ");
     const opts = ORDER_STATUSES.map(s => `<option value="${s}"${s===o.status?" selected":""}>${STATUS_HI[s]}</option>`).join("");
@@ -372,6 +416,7 @@ function renderOrders(){
       <td>${o.customerName||"–"}<br><small style="color:var(--muted)">${o.customerPhone||""}</small></td>
       <td style="max-width:220px"><small>${items||"–"}</small></td>
       <td><b>₹${o.subtotal!=null?o.subtotal:"?"}</b></td>
+      <td>${payCellHtml(o)}</td>
       <td><select class="status-select" data-oid="${o._id}">${opts}</select></td>
       <td style="white-space:nowrap"><button class="btn btn-sec" data-view-ord="${o._id}" type="button">👁️</button> <button class="btn btn-sec" data-del-ord="${o._id}" type="button" style="color:var(--red)">🗑️</button></td>
     </tr>`;
@@ -414,11 +459,28 @@ function showOrderDetail(docId){
     <div><b>Address:</b> ${o.customerAddress||"–"}</div>
     ${o.notes?`<div><b>Note:</b> ${o.notes}</div>`:""}
     <div><b>Date:</b> ${fmtDate(o.createdAt)}</div>
-    <div><b>Payment:</b> Cash on Delivery</div>
+    <div><b>Payment:</b> ${o.paymentMethod==="esewa"?"📱 eSewa":o.paymentMethod==="khalti"?"💜 Khalti":"💵 Cash on Delivery"}
+      ${o.paymentMethod!=="cod"?` <span class="status-pill ${o.paymentStatus==="verified"?"st-delivered":"st-pending"}">${o.paymentStatus==="verified"?"✓ Verified":"⏳ Unverified"}</span>`:""}</div>
+    ${o.paymentRef?`<div><b>Transaction Ref:</b> ${o.paymentRef}</div>`:""}
     <div><b>Status:</b> <span class="status-pill st-${o.status||"pending"}">${STATUS_HI[o.status]||o.status}</span></div>
     <div class="ord-items">${items||"<div class='ord-item'>Koi item nahi</div>"}</div>
     <div style="text-align:right;font-size:17px"><b>Total: ₹${o.subtotal!=null?o.subtotal:"?"}</b></div>`;
+  const vp = document.getElementById("verifyPayBtn");
+  const needVerify = o.paymentMethod && o.paymentMethod !== "cod" && o.paymentStatus !== "verified";
+  vp.style.display = needVerify ? "" : "none";
+  vp.onclick = () => verifyPayment(docId);
   document.getElementById("orderModal").classList.add("open");
+}
+
+async function verifyPayment(docId){
+  try {
+    await db.collection("orders").doc(docId).update({ paymentStatus: "verified", updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    const o = orders.find(x => x._id === docId);
+    if(o) o.paymentStatus = "verified";
+    toast("✅ Payment verified");
+    document.getElementById("orderModal").classList.remove("open");
+    renderOrders();
+  } catch(e){ toast("❌ Verify nahi hua"); }
 }
 
 async function loadCategories(){
