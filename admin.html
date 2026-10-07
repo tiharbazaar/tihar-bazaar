@@ -373,11 +373,12 @@ function renderOrders(){
       <td style="max-width:220px"><small>${items||"–"}</small></td>
       <td><b>₹${o.subtotal!=null?o.subtotal:"?"}</b></td>
       <td><select class="status-select" data-oid="${o._id}">${opts}</select></td>
-      <td><button class="btn btn-sec" data-view-ord="${o._id}" type="button">👁️</button></td>
+      <td style="white-space:nowrap"><button class="btn btn-sec" data-view-ord="${o._id}" type="button">👁️</button> <button class="btn btn-sec" data-del-ord="${o._id}" type="button" style="color:var(--red)">🗑️</button></td>
     </tr>`;
   }).join("");
   tb.querySelectorAll(".status-select").forEach(s => s.onchange = () => updateOrderStatus(s.dataset.oid, s.value));
   tb.querySelectorAll("[data-view-ord]").forEach(b => b.onclick = () => showOrderDetail(b.dataset.viewOrd));
+  tb.querySelectorAll("[data-del-ord]").forEach(b => b.onclick = () => deleteOrder(b.dataset.delOrd));
 }
 
 async function updateOrderStatus(docId, status){
@@ -388,6 +389,18 @@ async function updateOrderStatus(docId, status){
     toast("✅ Status: " + STATUS_HI[status]);
     renderOrders();
   } catch(e){ toast("❌ Update nahi hua"); }
+}
+
+async function deleteOrder(docId){
+  const o = orders.find(x => x._id === docId);
+  if(!o) return;
+  if(!(await confirmDlg(`Order ${o.orderId||docId} delete karna hai? Ye wapas nahi aayega.`))) return;
+  try {
+    await db.collection("orders").doc(docId).delete();
+    orders = orders.filter(x => x._id !== docId);
+    toast("🗑️ Order delete ho gaya");
+    renderOrders();
+  } catch(e){ toast("❌ Delete nahi hua"); }
 }
 
 function showOrderDetail(docId){
