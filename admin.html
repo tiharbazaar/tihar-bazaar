@@ -123,6 +123,7 @@ tr:hover td{background:#fafbff}
       <button class="navbtn" data-view="products" type="button">📦 <span>Products</span></button>
       <button class="navbtn" data-view="categories" type="button">🗂️ <span>Categories</span></button>
       <button class="navbtn" data-view="orders" type="button">🧾 <span>Orders</span></button>
+      <button class="navbtn" data-view="suppliers" type="button">🏭 <span>Suppliers</span></button>
       <button class="navbtn" data-view="settings" type="button">⚙️ <span>Settings</span></button>
       <button class="navbtn" data-view="import" type="button">📥 <span>Import</span></button>
     </nav>
@@ -141,6 +142,12 @@ tr:hover td{background:#fafbff}
       <div class="cards">
         <div class="stat"><div class="n" id="stValue">–</div><div class="l">Stock value (selling price)</div></div>
         <div class="stat"><div class="n" id="stProfit" style="color:var(--blue)">–</div><div class="l">Expected profit (10%)</div></div>
+      </div>
+      <h2 style="margin:22px 0 10px;font-size:18px">🔔 Alerts</h2>
+      <div class="cards" id="alertCards">
+        <div class="stat" id="alOrders" style="cursor:pointer"><div class="n" id="stPendOrd" style="color:var(--red)">–</div><div class="l">Pending orders</div></div>
+        <div class="stat" id="alPay" style="cursor:pointer"><div class="n" id="stUnverPay" style="color:#b06000">–</div><div class="l">Unverified payments</div></div>
+        <div class="stat"><div class="n" id="stSup" style="color:var(--blue)">–</div><div class="l">Suppliers</div></div>
       </div>
     </section>
     <!-- PRODUCTS -->
@@ -165,6 +172,17 @@ tr:hover td{background:#fafbff}
       <div class="tblwrap"><table>
         <thead><tr><th>Naam</th><th>Products</th><th></th></tr></thead>
         <tbody id="catRows"><tr><td colspan="3" class="empty">Loading...</td></tr></tbody>
+      </table></div>
+    </section>
+    <!-- SUPPLIERS -->
+    <section class="view" id="view-suppliers">
+      <h1>Suppliers</h1><div class="sub">Samaan kahan se aata hai — sabka hisaab</div>
+      <div class="toolbar">
+        <button class="btn btn-pri" id="addSupBtn" type="button">+ Naya Supplier</button>
+      </div>
+      <div class="tblwrap"><table>
+        <thead><tr><th>Naam</th><th>Phone / WhatsApp</th><th>Products</th><th></th></tr></thead>
+        <tbody id="supRows"><tr><td colspan="4" class="empty">Loading...</td></tr></tbody>
       </table></div>
     </section>
     <!-- SETTINGS -->
@@ -227,6 +245,7 @@ tr:hover td{background:#fafbff}
       <div class="frow"><label>Category *</label><select id="fCat"></select></div>
       <div class="frow"><label>Tag</label><select id="fTag"><option value="">—</option><option>नया</option><option>लोकप्रिय</option><option>बेस्टसेलर</option></select></div>
     </div>
+    <div class="frow"><label>Supplier</label><select id="fSupplier"><option value="">— Koi nahi —</option></select><div class="hint">Samaan kahan se aata hai</div></div>
     <div class="f2">
       <div class="frow"><label>Supplier Price (₹) *</label><input id="fSupPrice" type="number" min="0" placeholder="e.g. 450"><div class="hint">Company/supplier ka rate</div></div>
       <div class="frow"><label>Selling Price (₹)</label><input id="fPrice" type="number" min="0" placeholder="auto"><div class="hint">Khali chhodo to +10% auto</div></div>
@@ -250,6 +269,22 @@ tr:hover td{background:#fafbff}
     <div class="mclose" style="justify-content:center">
       <button class="btn btn-sec" id="confirmNo" type="button">Nahi</button>
       <button class="btn btn-pri" id="confirmYes" type="button">Haan, Karo</button>
+    </div>
+  </div>
+</div>
+<!-- SUPPLIER MODAL -->
+<div class="modal-shade" id="supModal">
+  <div class="modal">
+    <h2 id="supModalTitle">Naya Supplier</h2>
+    <div class="frow" style="margin-bottom:12px"><label>Supplier Naam *</label><input id="sName" type="text" placeholder="ABC Suppliers" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:8px"></div>
+    <div class="frow" style="margin-bottom:12px"><label>Contact Person</label><input id="sPerson" type="text" placeholder="Naam" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:8px"></div>
+    <div class="frow" style="margin-bottom:12px"><label>Phone</label><input id="sPhone" type="text" placeholder="98XXXXXXXX" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:8px"></div>
+    <div class="frow" style="margin-bottom:12px"><label>WhatsApp</label><input id="sWa" type="text" placeholder="98XXXXXXXX" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:8px"></div>
+    <div class="frow" style="margin-bottom:12px"><label>Address</label><input id="sAddr" type="text" placeholder="Kathmandu" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:8px"></div>
+    <div class="frow" style="margin-bottom:12px"><label>Notes</label><textarea id="sNotes" placeholder="Rate list, delivery time..." style="width:100%;padding:10px;border:1px solid var(--line);border-radius:8px"></textarea></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button class="btn btn-sec" id="supCancel" type="button">Cancel</button>
+      <button class="btn btn-pri" id="supSave" type="button">Save Karo</button>
     </div>
   </div>
 </div>
@@ -339,10 +374,15 @@ async function boot(){
   await loadProducts();
   renderDashboard();
   await loadOrders();
+  await loadSuppliers();
   await loadPaySettings();
   document.getElementById("saveSettings").onclick = savePaySettings;
   document.getElementById("orderFilter").onchange = renderOrders;
   document.getElementById("refreshOrders").onclick = loadOrders;
+  document.getElementById("addSupBtn").onclick = () => openSupModal(null);
+  document.getElementById("supCancel").onclick = () => document.getElementById("supModal").classList.remove("open");
+  document.getElementById("supSave").onclick = saveSupplier;
+  document.getElementById("supModal").addEventListener("click", e => { if (e.target.id === "supModal") e.target.classList.remove("open"); });
   document.getElementById("orderModalClose").onclick = () => document.getElementById("orderModal").classList.remove("open");
   document.getElementById("orderModal").addEventListener("click", e => { if (e.target.id === "orderModal") e.target.classList.remove("open"); });
 }
@@ -369,6 +409,106 @@ async function savePaySettings(){
   } catch(e){ toast("❌ Save nahi hua"); }
 }
 
+/* ============ SUPPLIERS ============ */
+let suppliers = [], editingSupId = null;
+
+async function loadSuppliers(){
+  try {
+    const snap = await db.collection("suppliers").orderBy("name").get();
+    suppliers = snap.docs.map(d => Object.assign({ _id: d.id }, d.data()));
+  } catch(e){ suppliers = []; }
+  renderSuppliers();
+  fillSupplierDropdown();
+}
+
+function fillSupplierDropdown(){
+  const sel = document.getElementById("fSupplier");
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">— Koi nahi —</option>' + suppliers.map(s => `<option value="${s._id}">${s.name}</option>`).join("");
+  if(cur) sel.value = cur;
+}
+
+function renderSuppliers(){
+  const tb = document.getElementById("supRows");
+  if(!suppliers.length){ tb.innerHTML = '<tr><td colspan="4" class="empty">Koi supplier nahi. + Naya Supplier dabao.</td></tr>'; return; }
+  tb.innerHTML = suppliers.map(s => {
+    const count = products.filter(pr => pr.supplierId === s._id).length;
+    const contact = [s.phone, s.whatsapp].filter(Boolean).join(" / ") || "–";
+    return `<tr>
+      <td><b>${s.name}</b>${s.contactPerson?`<br><small style="color:var(--muted)">${s.contactPerson}</small>`:""}</td>
+      <td style="white-space:nowrap">${contact}</td>
+      <td>${count} products</td>
+      <td style="white-space:nowrap">
+        <button class="btn btn-sec" data-sedit="${s._id}" type="button">✏️</button>
+        <button class="btn btn-sec" data-sdel="${s._id}" type="button" style="color:var(--red)">🗑️</button>
+      </td>
+    </tr>`;
+  }).join("");
+  tb.querySelectorAll("[data-sedit]").forEach(b => b.onclick = () => openSupModal(b.dataset.sedit));
+  tb.querySelectorAll("[data-sdel]").forEach(b => b.onclick = () => deleteSupplier(b.dataset.sdel));
+}
+
+function openSupModal(id){
+  editingSupId = id || null;
+  const s = id ? suppliers.find(x => x._id === id) : null;
+  document.getElementById("supModalTitle").textContent = s ? "Supplier Edit Karo" : "Naya Supplier";
+  document.getElementById("sName").value = s ? s.name || "" : "";
+  document.getElementById("sPerson").value = s ? s.contactPerson || "" : "";
+  document.getElementById("sPhone").value = s ? s.phone || "" : "";
+  document.getElementById("sWa").value = s ? s.whatsapp || "" : "";
+  document.getElementById("sAddr").value = s ? s.address || "" : "";
+  document.getElementById("sNotes").value = s ? s.notes || "" : "";
+  document.getElementById("supModal").classList.add("open");
+}
+
+async function saveSupplier(){
+  const name = document.getElementById("sName").value.trim();
+  if(!name){ toast("❌ Naam likho"); return; }
+  const data = {
+    name: name,
+    contactPerson: document.getElementById("sPerson").value.trim(),
+    phone: document.getElementById("sPhone").value.trim(),
+    whatsapp: document.getElementById("sWa").value.trim(),
+    address: document.getElementById("sAddr").value.trim(),
+    notes: document.getElementById("sNotes").value.trim(),
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  };
+  try {
+    if(editingSupId){
+      await db.collection("suppliers").doc(editingSupId).update(data);
+      toast("✅ Supplier update ho gaya");
+    } else {
+      data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+      await db.collection("suppliers").add(data);
+      toast("✅ Supplier add ho gaya");
+    }
+    document.getElementById("supModal").classList.remove("open");
+    await loadSuppliers();
+  } catch(e){ toast("❌ Save nahi hua"); }
+}
+
+async function deleteSupplier(id){
+  const s = suppliers.find(x => x._id === id);
+  if(!s) return;
+  const linked = products.filter(pr => pr.supplierId === id).length;
+  const msg = linked
+    ? `${s.name} delete karna hai? ${linked} products isse jude hain (unka supplier hat jayega).`
+    : `${s.name} delete karna hai? Ye wapas nahi aayega.`;
+  if(!(await confirmDlg(msg))) return;
+  try {
+    await db.collection("suppliers").doc(id).delete();
+    // unlink products
+    const batch = db.batch();
+    products.filter(pr => pr.supplierId === id).forEach(pr => {
+      batch.update(db.collection("products").doc(pr._id), { supplierId: null, supplierName: null });
+      pr.supplierId = null; pr.supplierName = null;
+    });
+    await batch.commit();
+    toast("🗑️ Supplier delete ho gaya");
+    await loadSuppliers();
+  } catch(e){ toast("❌ Delete nahi hua"); }
+}
+
 /* ============ ORDERS ============ */
 let orders = [];
 const ORDER_STATUSES = ["pending","confirmed","shipped","delivered","cancelled"];
@@ -385,6 +525,7 @@ async function loadOrders(){
     });
   } catch(e) { orders = []; }
   renderOrders();
+  try { renderDashboard(); } catch(e){}
 }
 
 function fmtDate(ts){
@@ -509,7 +650,13 @@ function renderDashboard(){
   products.forEach(p => { if (p.stock !== "out_of_stock" && p.price) { val += p.price; if (p.supplierPrice) prof += (p.price - p.supplierPrice); } });
   $("stValue").textContent = money(val);
   $("stProfit").textContent = money(prof);
+  $("stPendOrd").textContent = orders.filter(o => o.status === "pending").length;
+  $("stUnverPay").textContent = orders.filter(o => o.paymentMethod && o.paymentMethod !== "cod" && o.paymentStatus !== "verified").length;
+  $("stSup").textContent = suppliers.length;
 }
+
+document.getElementById("alOrders").onclick = () => document.querySelector('[data-view="orders"]').click();
+document.getElementById("alPay").onclick = () => { document.querySelector('[data-view="orders"]').click(); };
 
 /* ============ PRODUCTS ============ */
 function renderProducts(q){
@@ -556,6 +703,8 @@ function openModal(id){
   $("fSupPrice").value = p.supplierPrice == null ? "" : p.supplierPrice;
   $("fPrice").value = p.price == null ? "" : p.price;
   $("fStock").value = p.stock || "in_stock";
+  fillSupplierDropdown();
+  $("fSupplier").value = p.supplierId || "";
   $("fImage").value = p.image || "";
   $("fDesc").value = p.description || "";
   updateCalc();
@@ -589,6 +738,8 @@ $("modalSave").onclick = async () => {
     supplierPrice: sup, price, marginPct: 10,
     stock: $("fStock").value, image: $("fImage").value.trim(),
     description: $("fDesc").value.trim(),
+    supplierId: $("fSupplier").value || null,
+    supplierName: ($("fSupplier").value && suppliers.find(s => s._id === $("fSupplier").value) || {}).name || null,
     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
   };
   try {
