@@ -568,7 +568,7 @@
         await window.tiharPlaceOrder({orderId:orderId,customerName:name,customerPhone:phone,customerAddress:addr,notes:notes,items:items,subtotal:costs.subtotal,itemCount:orderItems.reduce((a,b)=>a+b.qty,0),status:'pending',paymentMethod:payMethod,paymentRef:payRef||null,paymentStatus:payMethod==='cod'?'cod':'unverified',userId:u?u.uid:null,userEmail:u?u.email:null});
         cart=cart.filter(ci=>!orderItems.some(oi=>oi.id===ci.id));updateCart();render();
         window._lastPayMethod=payMethod;window._lastPayStatus=payMethod==='cod'?'cod':'unverified';
-        try{ if(window.tiharWriteAlert) window.tiharWriteAlert({orderId:orderId,customerName:name,customerPhone:phone,subtotal:costs.subtotal,itemCount:orderItems.reduce((a,b)=>a+b.qty,0),paymentMethod:payMethod}); }catch(e){}
+        try{ if(window.tiharWriteAlert) window.tiharWriteAlert({orderId:orderId,subtotal:costs.subtotal,itemCount:orderItems.reduce((a,b)=>a+b.qty,0),paymentMethod:payMethod}); }catch(e){}
         renderOrderSuccess(orderId);
       }catch(e){err.textContent=c.orderFail;btn.disabled=false;}
     }
