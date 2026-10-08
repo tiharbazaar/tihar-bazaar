@@ -129,6 +129,7 @@ tr:hover td{background:#fafbff}
       <button class="navbtn" data-view="roles" type="button">👥 <span>Roles</span></button>
       <button class="navbtn" data-view="users" type="button">👤 <span>Users</span></button>
       <button class="navbtn" data-view="audit" type="button">📝 <span>Audit Log</span></button>
+      <button class="navbtn" data-view="notify" type="button">🔔 <span>Notifications</span></button>
     </nav>
     <div class="who"><div id="adminEmail"></div><button id="logoutBtn" type="button">Logout</button></div>
   </aside>
@@ -286,6 +287,26 @@ tr:hover td{background:#fafbff}
         <tbody id="auditRows"><tr><td colspan="4" class="empty">Loading...</td></tr></tbody>
       </table></div>
     </section>
+    <!-- NOTIFICATIONS -->
+    <section class="view" id="view-notify">
+      <h1>Notifications</h1><div class="sub">Customer ko message bhejo</div>
+      <div style="max-width:600px;">
+        <div class="toolbar" style="flex-direction:column;align-items:stretch;gap:10px;">
+          <input type="text" id="notifTitle" placeholder="Title... (jaise: Diwali Offer!)">
+          <textarea id="notifMsg" rows="4" placeholder="Message likho..." style="padding:10px;border:1px solid var(--line);border-radius:6px;font-size:14px;"></textarea>
+          <select id="notifTarget" style="padding:10px;border:1px solid var(--line);border-radius:6px;font-size:14px;">
+            <option value="all">Sabhi customers</option>
+            <option value="active">Active customers (pichhle 30 din me order)</option>
+          </select>
+          <button class="btn btn-pri" id="sendNotifBtn" type="button">📢 Bhejo</button>
+        </div>
+      </div>
+      <h3 style="margin-top:24px;">Bheji gayi notifications</h3>
+      <div class="tblwrap"><table>
+        <thead><tr><th>Time</th><th>Title</th><th>Message</th><th>Target</th></tr></thead>
+        <tbody id="notifRows"><tr><td colspan="4" class="empty">Loading...</td></tr></tbody>
+      </table></div>
+    </section>
   </main>
 </div>
 
@@ -421,6 +442,7 @@ document.querySelectorAll(".navbtn").forEach(b => b.onclick = () => {
   if (b.dataset.view === "roles") loadRoles();
   if (b.dataset.view === "users") loadUsers();
   if (b.dataset.view === "audit") loadAudit();
+  if (b.dataset.view === "notify") loadNotifs();
 });
 
 /* ============ DATA ============ */
@@ -943,6 +965,37 @@ $("clearAuditBtn").onclick = async () => {
   await batch.commit();
   toast("🗑️ Purana log saaf ho gaya");
   loadAudit();
+};
+
+/* ============ NOTIFICATIONS ============ */
+async function loadNotifs() {
+  try {
+    const snap = await db.collection("notifications").orderBy("createdAt", "desc").limit(50).get();
+    const list = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    $("notifRows").innerHTML = list.length ? list.map(n => {
+      let time = "-";
+      try { time = n.createdAt.toDate().toLocaleString("en-IN"); } catch(e) {}
+      return `<tr><td style="white-space:nowrap">${time}</td><td><b>${esc(n.title||"-")}</b></td><td>${esc(n.message||"-")}</td><td>${esc(n.target||"all")}</td></tr>`;
+    }).join("") : `<tr><td colspan="4" class="empty">Abhi tak koi notification nahi bheji.</td></tr>`;
+  } catch(e) {
+    $("notifRows").innerHTML = `<tr><td colspan="4" class="empty">Load nahi hua.</td></tr>`;
+  }
+}
+$("sendNotifBtn").onclick = async () => {
+  const title = $("notifTitle").value.trim();
+  const message = $("notifMsg").value.trim();
+  const target = $("notifTarget").value;
+  if (!title) { toast("⚠️ Title likho!"); return; }
+  if (!message) { toast("⚠️ Message likho!"); return; }
+  if (!(await confirmDlg(`"${title}" sabhi ko bhejna hai?`))) return;
+  await db.collection("notifications").add({
+    title, message, target,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
+  await auditLog("Notification bheji", title);
+  $("notifTitle").value = ""; $("notifMsg").value = "";
+  toast("📢 Notification save ho gayi!");
+  loadNotifs();
 };
 
 /* ============ CSV IMPORT ============ */
