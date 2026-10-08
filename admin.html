@@ -128,6 +128,7 @@ tr:hover td{background:#fafbff}
       <button class="navbtn" data-view="import" type="button">📥 <span>Import</span></button>
       <button class="navbtn" data-view="roles" type="button">👥 <span>Roles</span></button>
       <button class="navbtn" data-view="users" type="button">👤 <span>Users</span></button>
+      <button class="navbtn" data-view="audit" type="button">📝 <span>Audit Log</span></button>
     </nav>
     <div class="who"><div id="adminEmail"></div><button id="logoutBtn" type="button">Logout</button></div>
   </aside>
@@ -272,6 +273,19 @@ tr:hover td{background:#fafbff}
         <tbody id="userRows"><tr><td colspan="5" class="empty">Loading...</td></tr></tbody>
       </table></div>
     </section>
+    <!-- AUDIT LOG -->
+    <section class="view" id="view-audit">
+      <h1>Audit Log</h1><div class="sub">Kisne kab kya kiya - poora hisaab</div>
+      <div class="toolbar">
+        <input type="text" id="auditSearch" placeholder="Action ya user se khojo...">
+        <button class="btn btn-pri" id="searchAuditBtn" type="button">🔍 Khojo</button>
+        <button class="btn btn-sec" id="clearAuditBtn" type="button">🗑️ Purana saaf karo</button>
+      </div>
+      <div class="tblwrap"><table>
+        <thead><tr><th>Time</th><th>User</th><th>Action</th><th>Details</th></tr></thead>
+        <tbody id="auditRows"><tr><td colspan="4" class="empty">Loading...</td></tr></tbody>
+      </table></div>
+    </section>
   </main>
 </div>
 
@@ -406,6 +420,7 @@ document.querySelectorAll(".navbtn").forEach(b => b.onclick = () => {
   $("view-" + b.dataset.view).classList.add("active");
   if (b.dataset.view === "roles") loadRoles();
   if (b.dataset.view === "users") loadUsers();
+  if (b.dataset.view === "audit") loadAudit();
 });
 
 /* ============ DATA ============ */
@@ -889,6 +904,46 @@ async function loadUsers(search="") {
 }
 $("searchUserBtn").onclick = () => loadUsers($("userSearch").value.trim());
 $("userSearch").onkeydown = e => { if (e.key === "Enter") loadUsers($("userSearch").value.trim()); };
+
+/* ============ AUDIT LOG ============ */
+async function auditLog(action, details="") {
+  try {
+    const user = auth.currentUser;
+    await db.collection("audit_log").add({
+      action, details,
+      user: user ? user.email : "unknown",
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  } catch(e) {}
+}
+let auditEntries = [];
+async function loadAudit(search="") {
+  try {
+    const snap = await db.collection("audit_log").orderBy("createdAt", "desc").limit(200).get();
+    auditEntries = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    if (search) {
+      const s = search.toLowerCase();
+      auditEntries = auditEntries.filter(a => (a.action||"").toLowerCase().includes(s) || (a.user||"").toLowerCase().includes(s) || (a.details||"").toLowerCase().includes(s));
+    }
+  } catch(e) { auditEntries = []; }
+  $("auditRows").innerHTML = auditEntries.length ? auditEntries.map(a => {
+    let time = "-";
+    try { time = a.createdAt.toDate().toLocaleString("en-IN"); } catch(e) {}
+    return `<tr><td style="white-space:nowrap">${time}</td><td>${esc(a.user||"-")}</td><td><b>${esc(a.action||"-")}</b></td><td>${esc(a.details||"-")}</td></tr>`;
+  }).join("") : `<tr><td colspan="4" class="empty">Koi entry nahi.</td></tr>`;
+}
+$("searchAuditBtn").onclick = () => loadAudit($("auditSearch").value.trim());
+$("auditSearch").onkeydown = e => { if (e.key === "Enter") loadAudit($("auditSearch").value.trim()); };
+$("clearAuditBtn").onclick = async () => {
+  if (!(await confirmDlg("30 din se purana audit log delete karna hai?"))) return;
+  const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - 30);
+  const snap = await db.collection("audit_log").where("createdAt", "<", cutoff).get();
+  const batch = db.batch();
+  snap.docs.forEach(d => batch.delete(d.ref));
+  await batch.commit();
+  toast("🗑️ Purana log saaf ho gaya");
+  loadAudit();
+};
 
 /* ============ CSV IMPORT ============ */
 let csvData = [];
