@@ -130,6 +130,7 @@ tr:hover td{background:#fafbff}
       <button class="navbtn" data-view="users" type="button">👤 <span>Users</span></button>
       <button class="navbtn" data-view="audit" type="button">📝 <span>Audit Log</span></button>
       <button class="navbtn" data-view="notify" type="button">🔔 <span>Notifications</span></button>
+      <button class="navbtn" data-view="reports" type="button">📈 <span>Reports</span></button>
     </nav>
     <div class="who"><div id="adminEmail"></div><button id="logoutBtn" type="button">Logout</button></div>
   </aside>
@@ -305,6 +306,30 @@ tr:hover td{background:#fafbff}
       <div class="tblwrap"><table>
         <thead><tr><th>Time</th><th>Title</th><th>Message</th><th>Target</th></tr></thead>
         <tbody id="notifRows"><tr><td colspan="4" class="empty">Loading...</td></tr></tbody>
+      </table></div>
+    </section>
+    <!-- REPORTS -->
+    <section class="view" id="view-reports">
+      <h1>Reports</h1><div class="sub">Sale ki report nikalo</div>
+      <div class="toolbar">
+        <select id="reportType" style="padding:10px;border:1px solid var(--line);border-radius:6px;font-size:14px;">
+          <option value="sales">Sales Report</option>
+          <option value="products">Product Report</option>
+          <option value="orders">Order Report</option>
+        </select>
+        <select id="reportRange" style="padding:10px;border:1px solid var(--line);border-radius:6px;font-size:14px;">
+          <option value="7">Pichhle 7 din</option>
+          <option value="30">Pichhle 30 din</option>
+          <option value="90">Pichhle 90 din</option>
+          <option value="all">Sabhi</option>
+        </select>
+        <button class="btn btn-pri" id="genReportBtn" type="button">📊 Report banao</button>
+        <button class="btn btn-sec" id="dlReportBtn" type="button">⬇️ Excel download</button>
+      </div>
+      <div id="reportSummary" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:16px 0;"></div>
+      <div class="tblwrap"><table>
+        <thead><tr id="reportHead"><th>Data</th></tr></thead>
+        <tbody id="reportRows"><tr><td class="empty">Upar se report banao.</td></tr></tbody>
       </table></div>
     </section>
   </main>
@@ -996,6 +1021,67 @@ $("sendNotifBtn").onclick = async () => {
   $("notifTitle").value = ""; $("notifMsg").value = "";
   toast("📢 Notification save ho gayi!");
   loadNotifs();
+};
+
+/* ============ REPORTS ============ */
+let reportData = [];
+$("genReportBtn").onclick = async () => {
+  const type = $("reportType").value;
+  const range = $("reportRange").value;
+  let cutoff = null;
+  if (range !== "all") { cutoff = new Date(); cutoff.setDate(cutoff.getDate() - parseInt(range)); }
+  $("reportRows").innerHTML = `<tr><td class="empty">Report ban rahi hai...</td></tr>`;
+  try {
+    if (type === "sales" || type === "orders") {
+      const snap = await db.collection("orders").orderBy("createdAt", "desc").get();
+      let orders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      if (cutoff) orders = orders.filter(o => { try { return o.createdAt.toDate() >= cutoff; } catch(e) { return true; } });
+      let totalRevenue = 0, totalOrders = orders.length;
+      reportData = orders.map(o => {
+        let amt = 0;
+        try { (o.items||[]).forEach(i => { amt += (i.price||0) * (i.qty||1); }); } catch(e) {}
+        totalRevenue += amt;
+        let dt = "-"; try { dt = o.createdAt.toDate().toLocaleDateString("en-IN"); } catch(e) {}
+        return { date: dt, id: o.id, customer: o.name||o.email||"-", items: (o.items||[]).length, amount: amt, status: o.status||"pending", payment: o.payMethod||o.payment||"-" };
+      });
+      const avgOrder = totalOrders ? Math.round(totalRevenue/totalOrders) : 0;
+      $("reportSummary").innerHTML = `
+        <div style="background:#f0faf2;padding:16px;border-radius:8px;"><div style="font-size:13px;color:#666;">Kul Revenue</div><div style="font-size:24px;font-weight:800;">Rs ${totalRevenue.toLocaleString("en-IN")}</div></div>
+        <div style="background:#f0f4ff;padding:16px;border-radius:8px;"><div style="font-size:13px;color:#666;">Kul Orders</div><div style="font-size:24px;font-weight:800;">${totalOrders}</div></div>
+        <div style="background:#fff8f0;padding:16px;border-radius:8px;"><div style="font-size:13px;color:#666;">Average Order</div><div style="font-size:24px;font-weight:800;">Rs ${avgOrder.toLocaleString("en-IN")}</div></div>`;
+      $("reportHead").innerHTML = `<th>Date</th><th>Order ID</th><th>Customer</th><th>Items</th><th>Amount</th><th>Status</th><th>Payment</th>`;
+      $("reportRows").innerHTML = reportData.length ? reportData.map(r =>
+        `<tr><td>${r.date}</td><td>${esc(r.id)}</td><td>${esc(r.customer)}</td><td>${r.items}</td><td>Rs ${r.amount.toLocaleString("en-IN")}</td><td>${esc(r.status)}</td><td>${esc(r.payment)}</td></tr>`
+      ).join("") : `<tr><td colspan="7" class="empty">Koi order nahi.</td></tr>`;
+    } else if (type === "products") {
+      const snap = await db.collection("products").get();
+      const prods = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      reportData = prods.map(p => ({ name: p.name||"-", category: p.category||"-", price: p.price||0, stock: p.stock||0, value: (p.price||0)*(p.stock||0) }));
+      const totalValue = reportData.reduce((s,r) => s + r.value, 0);
+      $("reportSummary").innerHTML = `
+        <div style="background:#f0faf2;padding:16px;border-radius:8px;"><div style="font-size:13px;color:#666;">Kul Products</div><div style="font-size:24px;font-weight:800;">${reportData.length}</div></div>
+        <div style="background:#f0f4ff;padding:16px;border-radius:8px;"><div style="font-size:13px;color:#666;">Stock Value</div><div style="font-size:24px;font-weight:800;">Rs ${totalValue.toLocaleString("en-IN")}</div></div>`;
+      $("reportHead").innerHTML = `<th>Product</th><th>Category</th><th>Price</th><th>Stock</th><th>Stock Value</th>`;
+      $("reportRows").innerHTML = reportData.length ? reportData.map(r =>
+        `<tr><td>${esc(r.name)}</td><td>${esc(r.category)}</td><td>Rs ${r.price.toLocaleString("en-IN")}</td><td>${r.stock}</td><td>Rs ${r.value.toLocaleString("en-IN")}</td></tr>`
+      ).join("") : `<tr><td colspan="5" class="empty">Koi product nahi.</td></tr>`;
+    }
+    await auditLog("Report banayi", type + " / " + range + " din");
+  } catch(e) {
+    $("reportRows").innerHTML = `<tr><td class="empty">Error: ${esc(e.message)}</td></tr>`;
+  }
+};
+$("dlReportBtn").onclick = () => {
+  if (!reportData.length) { toast("⚠️ Pehle report banao!"); return; }
+  const keys = Object.keys(reportData[0]);
+  const csv = [keys.join(",")].concat(reportData.map(r => keys.map(k => `"${String(r[k]).replace(/"/g,'""')}"`).join(","))).join("\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "tihar-bazaar-report-" + $("reportType").value + ".csv";
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  toast("⬇️ Report download ho gayi!");
 };
 
 /* ============ CSV IMPORT ============ */
