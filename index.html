@@ -736,6 +736,151 @@ document.getElementById('verifySms').onclick=()=>{const c=uiCopy[currentLang];co
     document.getElementById('download').onclick=()=>{if(!cart.length){toast(trustCopy[currentLang].empty);return}const t=trustCopy[currentLang],costs=cartCosts(cart),qtyLabel={hi:'मात्रा',ne:'मात्रा',en:'Quantity'}[currentLang],lines=['TIHAR BAZAAR — '+t.cartTitle,'+977 9719631185','',...cart.map((item,i)=>{const p=products.find(product=>product.id===item.id);return localDigits(i+1)+'. '+productName(p)+' — '+qtyLabel+': '+localDigits(item.qty)+' — '+t.itemPrice+': '+(p.price?money(p.price)+(item.qty>1?' × '+localDigits(item.qty)+' = '+money(p.price*item.qty):''):uiCopy[currentLang].askPrice)}),'',t.subtotal+': '+subtotalText(costs),t.delivery+': '+t.deliveryPending,t.total+': '+totalText(costs),'',t.costNote];const blob=new Blob([lines.join('\n')],{type:'text/plain;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='tihar-bazaar-cart.txt';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast(currentLang==='en'?'Cart list downloaded':currentLang==='ne'?'कार्ट सूची डाउनलोड भयो':'कार्ट सूची डाउनलोड हो गई')};
     let timer;function toast(t){const el=document.getElementById('toast');el.textContent=t;el.classList.add('show');clearTimeout(timer);timer=setTimeout(()=>el.classList.remove('show'),1800)}
     loadStoreData();setLanguage('en');updateCart();var authUiSettled=false;window.tiharOnFirstAuth=function(u){authUiSettled=true;if(!u){showAuth(true);}else if(window.tiharCloseAuth){window.tiharCloseAuth();}};setTimeout(function(){if(!authUiSettled){showAuth(true);}},7000);
+
+    /* ============ NEW FEATURES (v2.1): Wishlist, Better Search, WhatsApp Share, Coupons ============ */
+    (function(){
+      /* ---------- 1. WISHLIST ---------- */
+      let wishlist=[];
+      try{ wishlist=JSON.parse(localStorage.getItem('tihar_wishlist')||'[]'); }catch(e){ wishlist=[]; }
+      function saveWishlist(){ try{ localStorage.setItem('tihar_wishlist', JSON.stringify(wishlist)); }catch(e){} updateWishlistBadge(); }
+      function isWishlisted(id){ return wishlist.indexOf(id)!==-1; }
+      function toggleWishlist(id, btn){
+        const i=wishlist.indexOf(id);
+        if(i===-1){ wishlist.push(id); toast(currentLang==='en'?'Added to wishlist':currentLang==='ne'?'इच्छासूचीमा थपियो':'वishlist में जोड़ा'); }
+        else{ wishlist.splice(i,1); toast(currentLang==='en'?'Removed from wishlist':currentLang==='ne'?'इच्छासूचीबाट हटाइयो':'वishlist से हटाया'); }
+        saveWishlist(); render();
+        if(typeof openDetail==='function' && activeDetailId===id){ /* detail will re-render on next open */ }
+      }
+      window.toggleWishlist=toggleWishlist; window.isWishlisted=isWishlisted;
+      function updateWishlistBadge(){
+        let badge=document.getElementById('wishlistCount');
+        if(!badge){
+          const cartBtn=document.getElementById('cartOpen');
+          if(cartBtn){
+            badge=document.createElement('span'); badge.id='wishlistCount';
+            badge.style.cssText='position:absolute;top:-6px;right:-6px;background:#e91e63;color:#fff;font-size:10px;min-width:18px;height:18px;border-radius:9px;display:grid;place-items:center;font-weight:800;padding:0 4px;';
+            cartBtn.style.position='relative'; cartBtn.parentElement.style.position='relative';
+            const wrap=document.createElement('span'); wrap.style.cssText='position:relative;display:inline-block;';
+            cartBtn.parentElement.insertBefore(wrap, cartBtn); wrap.appendChild(cartBtn); wrap.appendChild(badge);
+          }
+        }
+        if(badge){ badge.textContent=wishlist.length; badge.style.display=wishlist.length?'grid':'none'; }
+      }
+      /* Wishlist filter button in category pills */
+      function addWishlistFilter(){
+        const pills=document.querySelector('.pills, .category-pills, [data-filter]');
+        if(!pills || document.getElementById('wishlistFilterBtn')) return;
+        const btn=document.createElement('button');
+        btn.id='wishlistFilterBtn'; btn.type='button'; btn.className='pill';
+        btn.innerHTML='❤️ '+(currentLang==='en'?'Wishlist':currentLang==='ne'?'इच्छासूची':'वishlist')+' ('+wishlist.length+')';
+        btn.style.cssText='border:2px solid #e91e63;color:#e91e63;font-weight:800;';
+        btn.onclick=function(){
+          const grid=document.getElementById('productGrid')||document.querySelector('.product-grid');
+          if(!grid) return;
+          if(btn.dataset.active==='1'){ delete btn.dataset.active; btn.style.background=''; render(); return; }
+          btn.dataset.active='1'; btn.style.background='#fce4ec';
+          const list=(typeof products!=='undefined'?products:[]).filter(p=>wishlist.indexOf(p.id)!==-1);
+          const c=uiCopy[currentLang];
+          grid.innerHTML=list.length?list.map((p,i)=>{
+            const name=(typeof productName==='function'?productName(p):p.name)||'';
+            return '<article class="card" style="animation-delay:'+Math.min(i,11)*45+'ms"><div class="img-wrap">'+(p.img&&typeof productPhoto==='function'?productPhoto(p,'card'):'')+'</div><h3>'+name+'</h3><div class="card-actions"><button class="add" type="button" onclick="addToCart(\''+p.id+'\')">'+c.add+'</button></div></article>';
+          }).join(''):'<div class="empty">'+(currentLang==='en'?'Your wishlist is empty. Tap ❤️ on products to save them.':currentLang==='ne'?'तपाईंको इच्छासूची खाली छ।':'आपकी वishlist खाली है।')+'</div>';
+        };
+        pills.appendChild(btn);
+      }
+
+      /* ---------- 2. BETTER SEARCH ---------- */
+      function betterSearch(q){
+        q=(q||'').toLowerCase().trim();
+        if(!q || typeof products==='undefined') return null;
+        const words=q.split(/\s+/);
+        return products.filter(p=>{
+          const name=((typeof productName==='function'?productName(p):p.name)||'').toLowerCase();
+          const cat=(p.category||'').toLowerCase();
+          const desc=(p.description||'').toLowerCase();
+          const hay=name+' '+cat+' '+desc;
+          return words.every(w=>hay.indexOf(w)!==-1);
+        });
+      }
+      window.betterSearch=betterSearch;
+
+      /* ---------- 3. WHATSAPP SHARE ---------- */
+      function shareProduct(id){
+        const p=(typeof products!=='undefined'?products:[]).find(x=>x.id===id);
+        if(!p) return;
+        const name=(typeof productName==='function'?productName(p):p.name)||'Product';
+        const price=p.price?('Rs '+p.price):'Ask for price';
+        const url='https://tiharbazaar.github.io/tihar-bazaar/#product-'+id;
+        const text='🪔 *'+name+'*%0A💰 '+encodeURIComponent(price)+'%0A%0A'+encodeURIComponent('Check it on Tihar Bazaar:')+'%0A'+encodeURIComponent(url);
+        window.open('https://wa.me/?text='+text, '_blank');
+      }
+      window.shareProduct=shareProduct;
+
+      /* ---------- 4. DISCOUNT COUPONS ---------- */
+      const COUPONS={ 'TIHAR10':10, 'DIWALI20':20, 'WELCOME5':5, 'FESTIVE15':15 };
+      let appliedCoupon=null;
+      function applyCoupon(code){
+        code=(code||'').toUpperCase().trim();
+        if(COUPONS[code]){ appliedCoupon={code:code, pct:COUPONS[code]}; toast('✅ '+code+': '+COUPONS[code]+'% '+(currentLang==='en'?'off applied!':currentLang==='ne'?'छुट लागू भयो!':'छूट लागू!')); }
+        else{ appliedCoupon=null; toast(currentLang==='en'?'Invalid coupon code':currentLang==='ne'?'अमान्य कुपन कोड':'अमान्य कूपन कोड'); }
+        if(typeof updateCart==='function') updateCart();
+        renderCouponUI();
+        return appliedCoupon;
+      }
+      window.applyCoupon=applyCoupon;
+      window.getAppliedCoupon=function(){ return appliedCoupon; };
+      window.couponDiscount=function(subtotal){
+        if(!appliedCoupon || !subtotal) return 0;
+        return Math.round(subtotal*appliedCoupon.pct/100);
+      };
+      function renderCouponUI(){
+        let box=document.getElementById('couponBox');
+        if(!box){
+          const foot=document.querySelector('.panel-foot .cost-breakdown');
+          if(!foot) return;
+          box=document.createElement('div'); box.id='couponBox';
+          box.style.cssText='display:flex;gap:8px;padding:10px 12px;border-top:1px solid var(--line);';
+          box.innerHTML='<input id="couponInput" type="text" placeholder="Coupon code (e.g. TIHAR10)" style="flex:1;padding:8px;border:1px solid var(--line);border-radius:3px;text-transform:uppercase;" maxlength="20"><button id="couponApply" type="button" style="padding:8px 14px;background:#b3541e;color:#fff;border:0;border-radius:3px;font-weight:800;">Apply</button>';
+          foot.parentElement.insertBefore(box, foot.nextSibling);
+          document.getElementById('couponApply').onclick=function(){ applyCoupon(document.getElementById('couponInput').value); };
+          document.getElementById('couponInput').addEventListener('keydown',function(e){ if(e.key==='Enter'){ applyCoupon(e.target.value); } });
+        }
+        const input=document.getElementById('couponInput');
+        if(input && appliedCoupon){ input.value=appliedCoupon.code; input.style.borderColor='#4caf50'; }
+      }
+      /* Inject wishlist hearts + share buttons into product cards after each render */
+      const origRender=window.render;
+      if(typeof render==='function'){
+        const _render=render;
+        window.render=render=function(){
+          _render();
+          try{
+            document.querySelectorAll('.card[data-product-id]').forEach(card=>{
+              const pid=card.getAttribute('data-product-id');
+              if(card.querySelector('.wish-btn')) return;
+              const actions=card.querySelector('.card-actions');
+              if(!actions) return;
+              const wish=document.createElement('button');
+              wish.type='button'; wish.className='wish-btn';
+              wish.innerHTML=isWishlisted(pid)?'❤️':'🤍';
+              wish.title='Wishlist';
+              wish.style.cssText='border:1px solid #e91e63;background:#fff;border-radius:3px;padding:6px 10px;font-size:16px;cursor:pointer;';
+              wish.onclick=function(e){ e.stopPropagation(); toggleWishlist(pid); };
+              const share=document.createElement('button');
+              share.type='button'; share.className='share-btn'; share.innerHTML='📤';
+              share.title='Share on WhatsApp';
+              share.style.cssText='border:1px solid #25d366;background:#fff;border-radius:3px;padding:6px 10px;font-size:16px;cursor:pointer;';
+              share.onclick=function(e){ e.stopPropagation(); shareProduct(pid); };
+              actions.appendChild(wish); actions.appendChild(share);
+            });
+          }catch(e){}
+          updateWishlistBadge(); addWishlistFilter(); renderCouponUI();
+        };
+      }
+      /* Init */
+      updateWishlistBadge();
+      setTimeout(function(){ addWishlistFilter(); renderCouponUI(); }, 1500);
+    })();
   </script>
     <script type="module">
   // Firebase Authentication (free): Google, Facebook, Email/Password, Phone SMS.
