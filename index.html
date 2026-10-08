@@ -180,7 +180,7 @@
       <a class="brand" href="#top" aria-label="Tihar Bazaar home"><img src="assets/tihar-bazaar-logo.jpg" alt="Tihar Bazaar" style="height:42px;width:42px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:8px">Tihar Bazaar<small>Festive Vibes, Better Choices</small></a>
       <div class="search">
         <svg width="21" height="21" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="m16.5 16.5 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-        <input id="search" type="search" aria-label="उत्पाद खोजें" placeholder="त्योहार या इलेक्ट्रॉनिक्स सामान खोजें…" autocomplete="off" />
+        <input id="search" type="search" aria-label="उत्पाद खोजें" placeholder="Search festive or electronic items…" autocomplete="off" />
         <button class="voice" id="voiceSearch" type="button" aria-label="आवाज़ से खोजें" title="आवाज़ से खोजें"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" stroke="currentColor" stroke-width="2"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3M9 21h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
       </div>
       <select class="site-language" id="siteLanguage" aria-label="Language" style="display:none"><option value="en" selected>English</option></select>
@@ -188,13 +188,13 @@
       <button class="account-button" id="ordersOpen" type="button" aria-label="Orders"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M21 8.5v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-9" stroke="currentColor" stroke-width="1.8"/><path d="M1 8.5h22v2a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-2Z" stroke="currentColor" stroke-width="1.8"/><path d="M9 8.5V6a3 3 0 0 1 6 0v2.5" stroke="currentColor" stroke-width="1.8"/></svg><span id="ordersLabel">Orders</span></button>
       <button class="cart-button" id="cartOpen" type="button" aria-label="कार्ट खोलें">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 4h2l2.2 10.2a2 2 0 0 0 2 1.6h7.9a2 2 0 0 0 2-1.6L20.5 8H6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="9" cy="20" r="1.5" fill="currentColor"/><circle cx="18" cy="20" r="1.5" fill="currentColor"/></svg>
-        <span class="label">कार्ट</span><span class="cart-count" id="cartCount">0</span>
+        <span class="label">Cart</span><span class="cart-count" id="cartCount">0</span>
       </button>
     </div>
   </header>
   <div class="shop-layout"><div class="shop-main"><div class="filter-strip"><button class="cat-menu-btn" id="catMenuBtn" type="button">☰ Categories</button>
     <nav class="categories" aria-label="श्रेणियाँ" id="categories"></nav>
-    <label class="price-filter" for="priceRange"><span id="priceFilterLabel">कीमत</span><select id="priceRange" aria-label="कीमत सीमा"></select></label>
+    <label class="price-filter" for="priceRange"><span id="priceFilterLabel">Price</span><select id="priceRange" aria-label="कीमत सीमा"></select></label>
   </div>
   <section class="delivery-check" aria-label="स्थान के अनुसार डिलीवरी जाँचें">
     <label for="deliveryLocation"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 21s7-6.3 7-12a7 7 0 1 0-14 0c0 5.7 7 12 7 12Z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="9" r="2.3" stroke="currentColor" stroke-width="1.8"/></svg>डिलीवरी स्थान</label>
@@ -204,15 +204,15 @@
   <main class="shell">
     <section class="banner-carousel" aria-label="मुख्य ऑफर" id="bannerCarousel">
       <article class="promo-slide festival active" data-slide="0">
-        <div class="hero-copy"><h1>हर त्योहार की तैयारी, एक ही जगह</h1><p>सजावट, पारंपरिक पहनावे और पूजा सामग्री का खास संग्रह।</p><a href="#products" data-filter="सभी">अभी देखें</a></div>
+        <div class="hero-copy"><h1>Everything for Every Festival</h1><p>सजावट, पारंपरिक पहनावे और पूजा सामग्री का खास संग्रह।</p><a href="#products" data-filter="सभी">अभी देखें</a></div>
         <div class="hero-art" aria-hidden="true"><span class="spark s1">✦</span><span class="spark s2">✦</span><span class="spark s3">✦</span><div class="lamp"></div></div>
       </article>
       <article class="promo-slide tech" data-slide="1" aria-hidden="true">
-        <div class="hero-copy"><h1>मोबाइल से लैपटॉप तक</h1><p>रोज़मर्रा के इलेक्ट्रॉनिक्स और ज़रूरी एक्सेसरीज़ एक साथ।</p><a href="#products" data-filter="इलेक्ट्रॉनिक्स">इलेक्ट्रॉनिक्स देखें</a></div>
+        <div class="hero-copy"><h1>From Mobiles to Laptops</h1><p>रोज़मर्रा के इलेक्ट्रॉनिक्स और ज़रूरी एक्सेसरीज़ एक साथ।</p><a href="#products" data-filter="इलेक्ट्रॉनिक्स">इलेक्ट्रॉनिक्स देखें</a></div>
         <div class="hero-art" aria-hidden="true"><div class="hero-gadget"></div></div>
       </article>
       <article class="promo-slide value" data-slide="2" aria-hidden="true">
-        <div class="hero-copy"><h1>सीधी और साफ़ कीमत</h1><p>सूचीबद्ध अंतिम NPR कीमतों में केवल 10% मार्जिन। शिपिंग अलग।</p><a href="#products" data-filter="सभी">उत्पाद देखें</a></div>
+        <div class="hero-copy"><h1>Straightforward Pricing</h1><p>सूचीबद्ध अंतिम NPR कीमतों में केवल 10% मार्जिन। शिपिंग अलग।</p><a href="#products" data-filter="सभी">उत्पाद देखें</a></div>
         <div class="hero-art" aria-hidden="true"><div class="value-mark">+10%</div></div>
       </article>
       <button class="carousel-control prev" id="bannerPrev" type="button" aria-label="पिछला ऑफर">‹</button>
@@ -225,7 +225,7 @@
     </section>
 
     <section class="deals" aria-label="आज के ऑफर">
-      <div class="deals-head"><h2>आज के खास ऑफर</h2><span>सूचीबद्ध अंतिम NPR कीमत • केवल 10% मार्जिन</span></div>
+      <div class="deals-head"><h2>Today's Special Offers</h2><span>सूचीबद्ध अंतिम NPR कीमत • केवल 10% मार्जिन</span></div>
       <div class="deal-grid">
         <button class="deal-card" type="button" data-deal="इलेक्ट्रॉनिक्स"><strong>इलेक्ट्रॉनिक्स</strong><span>मोबाइल, लैपटॉप और एक्सेसरीज़</span><em>देखें →</em></button>
         <button class="deal-card" type="button" data-deal="पहनावा"><strong>फेस्टिव फैशन</strong><span>साड़ी, कुर्ता और एथनिक सेट</span><em>देखें →</em></button>
@@ -255,7 +255,7 @@
     </section>
 
     <section class="section" id="products">
-      <div class="section-head"><div><h2>त्योहार और इलेक्ट्रॉनिक्स</h2><p>अपनी पसंद की चीज़ें कार्ट में जोड़ें या सीधे ऑर्डर करें</p></div><span class="result-count" id="resultCount"></span></div>
+      <div class="section-head"><div><h2>Festive & Electronics</h2><p>Add your favourites to cart or order directly</p></div><span class="result-count" id="resultCount"></span></div>
       <div class="grid" id="grid"></div>
     </section>
 
@@ -335,7 +335,7 @@
   <aside class="drawer" id="drawer" aria-hidden="true">
     <div class="shade" id="shade"></div>
     <section class="panel" role="dialog" aria-modal="true" aria-labelledby="cartTitle">
-      <div class="panel-head"><h2 id="cartTitle">मेरा कार्ट</h2><button class="close" id="close" type="button" aria-label="बंद करें">×</button></div>
+      <div class="panel-head"><h2 id="cartTitle">My Cart</h2><button class="close" id="close" type="button" aria-label="बंद करें">×</button></div>
       <div class="cart-list" id="cartList"></div>
       <div class="panel-foot"><div class="cost-breakdown" id="costBreakdown" aria-label="पूरा खर्च"></div><div class="cart-order-actions"><button class="whatsapp-order" id="placeOrderBtn" type="button" aria-disabled="true" style="border:0;cursor:pointer;font-family:inherit;font-size:inherit"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 11.6a8 8 0 0 1-11.8 7L4 20l1.4-4A8 8 0 1 1 20 11.6Z" stroke="currentColor" stroke-width="1.8"/><path d="M9 8.2c.4 2.4 2.1 4.2 4.6 4.9l1.1-1.1 1.9.9c.3.1.5.5.3.8-.5 1.2-1.7 1.8-3 1.5-3.6-.8-6.1-3.4-6.9-6.8-.3-1.3.4-2.5 1.6-3 .3-.1.7 0 .8.4l.8 1.8L9 8.2Z" fill="currentColor"/></svg><span id="whatsappOrderText">WhatsApp पर ऑर्डर करें</span></button><button class="download" id="download" type="button">कार्ट सूची डाउनलोड करें</button></div></div>
     </section>
