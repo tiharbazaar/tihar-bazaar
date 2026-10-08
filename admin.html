@@ -127,6 +127,7 @@ tr:hover td{background:#fafbff}
       <button class="navbtn" data-view="settings" type="button">⚙️ <span>Settings</span></button>
       <button class="navbtn" data-view="import" type="button">📥 <span>Import</span></button>
       <button class="navbtn" data-view="roles" type="button">👥 <span>Roles</span></button>
+      <button class="navbtn" data-view="users" type="button">👤 <span>Users</span></button>
     </nav>
     <div class="who"><div id="adminEmail"></div><button id="logoutBtn" type="button">Logout</button></div>
   </aside>
@@ -258,6 +259,18 @@ tr:hover td{background:#fafbff}
           </tbody>
         </table>
       </div>
+    </section>
+    <!-- USERS -->
+    <section class="view" id="view-users">
+      <h1>User Management</h1><div class="sub">Customer ko dekho, block karo</div>
+      <div class="toolbar">
+        <input type="text" id="userSearch" placeholder="Email ya naam se khojo...">
+        <button class="btn btn-pri" id="searchUserBtn" type="button">🔍 Khojo</button>
+      </div>
+      <div class="tblwrap"><table>
+        <thead><tr><th>Naam</th><th>Email</th><th>Orders</th><th>Status</th><th></th></tr></thead>
+        <tbody id="userRows"><tr><td colspan="5" class="empty">Loading...</td></tr></tbody>
+      </table></div>
     </section>
   </main>
 </div>
@@ -392,6 +405,7 @@ document.querySelectorAll(".navbtn").forEach(b => b.onclick = () => {
   b.classList.add("active");
   $("view-" + b.dataset.view).classList.add("active");
   if (b.dataset.view === "roles") loadRoles();
+  if (b.dataset.view === "users") loadUsers();
 });
 
 /* ============ DATA ============ */
@@ -836,6 +850,45 @@ $("addRoleBtn").onclick = async () => {
   toast("✅ Role add ho gaya!");
   loadRoles();
 };
+
+/* ============ USERS ============ */
+let users = [];
+async function loadUsers(search="") {
+  try {
+    const snap = await db.collection("users").get();
+    users = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    if (search) {
+      const s = search.toLowerCase();
+      users = users.filter(u => (u.email||"").toLowerCase().includes(s) || (u.name||"").toLowerCase().includes(s));
+    }
+  } catch(e) { users = []; }
+  // Get order counts
+  let orderCounts = {};
+  try {
+    const osnap = await db.collection("orders").get();
+    osnap.docs.forEach(d => {
+      const email = d.data().email;
+      if (email) orderCounts[email] = (orderCounts[email]||0) + 1;
+    });
+  } catch(e) {}
+  $("userRows").innerHTML = users.length ? users.map(u => {
+    const blocked = u.blocked ? '<span style="color:red;font-weight:700;">Blocked</span>' : '<span style="color:green;">Active</span>';
+    const btnText = u.blocked ? "Unblock" : "Block";
+    const btnClass = u.blocked ? "btn-pri" : "del";
+    return `<tr><td><b>${esc(u.name||"-")}</b></td><td>${esc(u.email||"-")}</td><td>${orderCounts[u.email]||0}</td><td>${blocked}</td>
+      <td><div class="rowbtns"><button data-ublock="${u.id}" data-blocked="${u.blocked?1:0}" class="btn ${btnClass}" type="button">${btnText}</button></div></td></tr>`;
+  }).join("") : `<tr><td colspan="5" class="empty">Koi user nahi mila.</td></tr>`;
+  document.querySelectorAll("[data-ublock]").forEach(b => b.onclick = async () => {
+    const isBlocked = b.dataset.blocked === "1";
+    const action = isBlocked ? "unblock" : "block";
+    if (!(await confirmDlg(`User ko ${action} karna hai?`))) return;
+    await db.collection("users").doc(b.dataset.ublock).update({ blocked: !isBlocked });
+    toast(isBlocked ? "✅ User unblock ho gaya" : "🚫 User block ho gaya");
+    loadUsers($("userSearch").value.trim());
+  });
+}
+$("searchUserBtn").onclick = () => loadUsers($("userSearch").value.trim());
+$("userSearch").onkeydown = e => { if (e.key === "Enter") loadUsers($("userSearch").value.trim()); };
 
 /* ============ CSV IMPORT ============ */
 let csvData = [];
