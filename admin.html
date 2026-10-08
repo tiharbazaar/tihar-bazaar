@@ -126,6 +126,7 @@ tr:hover td{background:#fafbff}
       <button class="navbtn" data-view="suppliers" type="button">🏭 <span>Suppliers</span></button>
       <button class="navbtn" data-view="settings" type="button">⚙️ <span>Settings</span></button>
       <button class="navbtn" data-view="import" type="button">📥 <span>Import</span></button>
+      <button class="navbtn" data-view="roles" type="button">👥 <span>Roles</span></button>
     </nav>
     <div class="who"><div id="adminEmail"></div><button id="logoutBtn" type="button">Logout</button></div>
   </aside>
@@ -230,6 +231,32 @@ tr:hover td{background:#fafbff}
           <button class="btn btn-pri" id="csvImportBtn" type="button">Import Karo</button>
           <button class="btn btn-sec" id="csvCancelBtn" type="button">Cancel</button>
         </div>
+      </div>
+    </section>
+    <!-- ROLES -->
+    <section class="view" id="view-roles">
+      <h1>Roles & Permissions</h1><div class="sub">Kaun kya kar sakta hai</div>
+      <div class="toolbar">
+        <input type="text" id="roleName" placeholder="Naye role ka naam...">
+        <input type="email" id="roleEmail" placeholder="User ka email...">
+        <button class="btn btn-pri" id="addRoleBtn" type="button">+ Add Role</button>
+      </div>
+      <div class="tblwrap"><table>
+        <thead><tr><th>Role</th><th>Email</th><th>Permissions</th><th></th></tr></thead>
+        <tbody id="roleRows"><tr><td colspan="4" class="empty">Loading...</td></tr></tbody>
+      </table></div>
+      <div style="margin-top:20px;padding:16px;background:#f8f9fa;border-radius:8px;">
+        <h3 style="margin:0 0 10px;">Default Roles</h3>
+        <table>
+          <thead><tr><th>Role</th><th>Kar sakta hai</th><th>Nahi kar sakta</th></tr></thead>
+          <tbody>
+            <tr><td><b>Super Admin</b></td><td>Sab kuch</td><td>—</td></tr>
+            <tr><td><b>Operations</b></td><td>Products, Categories, Orders</td><td>Payments, Settings</td></tr>
+            <tr><td><b>Finance</b></td><td>Payments, Reports</td><td>Products, Users</td></tr>
+            <tr><td><b>Marketing</b></td><td>Banners, Notifications</td><td>Payments, Users</td></tr>
+            <tr><td><b>Support</b></td><td>Orders dekhna</td><td>Refund, Delete</td></tr>
+          </tbody>
+        </table>
       </div>
     </section>
   </main>
@@ -364,6 +391,7 @@ document.querySelectorAll(".navbtn").forEach(b => b.onclick = () => {
   document.querySelectorAll(".view").forEach(x => x.classList.remove("active"));
   b.classList.add("active");
   $("view-" + b.dataset.view).classList.add("active");
+  if (b.dataset.view === "roles") loadRoles();
 });
 
 /* ============ DATA ============ */
@@ -778,6 +806,35 @@ $("addCatBtn").onclick = async () => {
   $("catName").value = "";
   toast("✅ Category add ho gayi!");
   loadCategories();
+};
+
+/* ============ ROLES ============ */
+let roles = [];
+async function loadRoles() {
+  try {
+    const snap = await db.collection("roles").orderBy("createdAt", "desc").get();
+    roles = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch(e) { roles = []; }
+  $("roleRows").innerHTML = roles.length ? roles.map(r => {
+    return `<tr><td><b>${esc(r.name)}</b></td><td>${esc(r.email||"-")}</td><td>${esc((r.permissions||[]).join(", ")||"—")}</td>
+      <td><div class="rowbtns"><button data-rdel="${r.id}" class="del" type="button">Delete</button></div></td></tr>`;
+  }).join("") : `<tr><td colspan="4" class="empty">Koi role nahi. Upar se add karo.</td></tr>`;
+  document.querySelectorAll("[data-rdel]").forEach(b => b.onclick = async () => {
+    if (!(await confirmDlg("Role delete karna hai?"))) return;
+    await db.collection("roles").doc(b.dataset.rdel).delete();
+    toast("🗑️ Role delete");
+    loadRoles();
+  });
+}
+$("addRoleBtn").onclick = async () => {
+  const name = $("roleName").value.trim();
+  const email = $("roleEmail").value.trim();
+  if (!name) { toast("⚠️ Role ka naam likho!"); return; }
+  if (!email) { toast("⚠️ Email likho!"); return; }
+  await db.collection("roles").add({ name, email, permissions: [], createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+  $("roleName").value = ""; $("roleEmail").value = "";
+  toast("✅ Role add ho gaya!");
+  loadRoles();
 };
 
 /* ============ CSV IMPORT ============ */
