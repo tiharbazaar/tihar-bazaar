@@ -214,6 +214,12 @@ tr:hover td{background:#fafbff}
     </section>
     <!-- IMPORT -->
     <section class="view" id="view-import">
+      <div style="margin-bottom:20px;padding:16px;background:#f0faf2;border-radius:8px;border:1px solid #c8e6c9;">
+        <h3 style="margin:0 0 10px;">🖼️ Product Images Update</h3>
+        <p style="margin:0 0 10px;color:#666;font-size:14px;">1539 products ki images ek click me update karo</p>
+        <button class="btn btn-pri" id="updateImagesBtn" type="button">🖼️ Images Update Karo</button>
+        <div id="imgUpdateStatus" style="margin-top:10px;font-size:14px;"></div>
+      </div>
       <h1>Import</h1><div class="sub">Ek saath hazaaron products lao</div>
       <div class="seedbox">
         <h3>🌱 Pehli baar setup</h3>
@@ -1166,5 +1172,1221 @@ $("seedBtn").onclick = async () => {
   $("seedBtn").textContent = "77 Products Import Karo";
 };
 </script>
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tihar Bazaar — Admin Panel</title>
+<meta name="robots" content="noindex, nofollow">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<style>
+:root{--bg:#f4f6fb;--card:#fff;--ink:#1c2333;--muted:#6b7690;--line:#e4e8f2;--blue:#1a73e8;--green:#1e9e5a;--red:#d93025;--orange:#f29900}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh}
+/* login */
+.login-wrap{min-height:100vh;display:grid;place-items:center;padding:20px}
+.login-card{background:var(--card);border-radius:14px;padding:40px 36px;max-width:420px;width:100%;box-shadow:0 8px 30px rgba(20,30,60,.1);text-align:center}
+.login-card h1{font-size:24px;margin-bottom:6px}
+.login-card p{color:var(--muted);font-size:14px;margin-bottom:24px}
+.gbtn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:13px;border:1px solid var(--line);border-radius:8px;background:#fff;font-size:15px;font-weight:600;cursor:pointer}
+.gbtn:hover{background:#f8faff;border-color:var(--blue)}
+.login-err{color:var(--red);font-size:13px;margin-top:14px;min-height:18px}
+/* layout */
+.admin{display:flex;min-height:100vh}
+.sidebar{width:230px;background:#17203a;color:#fff;padding:22px 0;flex-shrink:0;position:sticky;top:0;height:100vh}
+.sidebar h2{font-size:18px;padding:0 22px 18px;border-bottom:1px solid rgba(255,255,255,.12)}
+.sidebar nav{padding:14px 0}
+.navbtn{display:flex;align-items:center;gap:10px;width:100%;padding:12px 22px;background:none;border:0;color:#c6cdea;font-size:15px;cursor:pointer;text-align:left}
+.navbtn:hover{background:rgba(255,255,255,.06);color:#fff}
+.navbtn.active{background:rgba(255,255,255,.12);color:#fff;border-left:4px solid var(--blue);padding-left:18px}
+.sidebar .who{padding:16px 22px;border-top:1px solid rgba(255,255,255,.12);font-size:13px;color:#9aa5c7}
+.sidebar .who button{margin-top:8px;background:rgba(255,255,255,.1);color:#fff;border:0;padding:8px 14px;border-radius:6px;cursor:pointer;font-size:13px}
+.main{flex:1;padding:28px;max-width:1200px}
+.main h1{font-size:24px;margin-bottom:4px}
+.main .sub{color:var(--muted);font-size:14px;margin-bottom:22px}
+.view{display:none}.view.active{display:block}
+/* cards */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:26px}
+.stat{background:var(--card);border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(20,30,60,.06)}
+.stat .n{font-size:30px;font-weight:800}
+.stat .l{color:var(--muted);font-size:13px;margin-top:4px}
+/* table */
+.toolbar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.toolbar input[type=text]{flex:1;min-width:200px;padding:11px 14px;border:1px solid var(--line);border-radius:8px;font-size:14px}
+.btn{padding:11px 18px;border:0;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer}
+.btn-pri{background:var(--blue);color:#fff}.btn-pri:hover{background:#1558b0}
+.btn-sec{background:#eef1f8;color:var(--ink)}.btn-sec:hover{background:#e0e5f2}
+.btn-danger{background:#fdeceb;color:var(--red)}.btn-danger:hover{background:#fbd9d5}
+.btn-green{background:var(--green);color:#fff}
+.tblwrap{background:var(--card);border-radius:12px;overflow:auto;box-shadow:0 2px 8px rgba(20,30,60,.06)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{padding:12px 14px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+th{background:#f8fafd;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.4px}
+tr:hover td{background:#fafbff}
+.pthumb{width:44px;height:44px;object-fit:cover;border-radius:8px;background:#f0f2f8}
+.badge{display:inline-block;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:700}
+.b-in{background:#e6f6ec;color:var(--green)}.b-out{background:#fdeceb;color:var(--red)}
+.rowbtns{display:flex;gap:6px}
+.rowbtns button{padding:7px 12px;border:1px solid var(--line);background:#fff;border-radius:6px;font-size:13px;cursor:pointer}
+.rowbtns button:hover{border-color:var(--blue);color:var(--blue)}
+.rowbtns button.del:hover{border-color:var(--red);color:var(--red)}
+/* modal */
+.modal-shade{position:fixed;inset:0;background:rgba(15,22,40,.5);display:none;place-items:center;z-index:50;padding:18px}
+.modal-shade.open{display:grid}
+.modal{background:#fff;border-radius:14px;max-width:560px;width:100%;max-height:92vh;overflow:auto;padding:28px}
+.modal h2{font-size:20px;margin-bottom:18px}
+.frow{margin-bottom:14px}
+.frow label{display:block;font-size:13px;font-weight:700;margin-bottom:6px}
+.frow input,.frow select,.frow textarea{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:8px;font-size:14px}
+.frow textarea{resize:vertical;min-height:70px}
+.frow .hint{font-size:12px;color:var(--muted);margin-top:4px}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.mclose{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
+.calc{background:#f0f7ff;border:1px dashed var(--blue);border-radius:8px;padding:12px 14px;font-size:14px;margin-bottom:14px}
+.calc b{color:var(--blue)}
+/* import */
+.drop{border:2px dashed var(--line);border-radius:12px;background:var(--card);padding:34px;text-align:center;margin-bottom:18px}
+.drop:hover{border-color:var(--blue)}
+.drop input{display:none}
+.preview{background:var(--card);border-radius:12px;padding:18px;margin-bottom:18px;box-shadow:0 2px 8px rgba(20,30,60,.06)}
+.seedbox{background:#fff8e6;border:1px solid #f5d67b;border-radius:12px;padding:20px;margin-bottom:18px}
+.seedbox h3{font-size:16px;margin-bottom:8px}
+.seedbox p{font-size:13px;color:var(--muted);margin-bottom:12px}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#17203a;color:#fff;padding:13px 22px;border-radius:10px;font-size:14px;display:none;z-index:99;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+.toast.show{display:block}
+.empty{padding:40px;text-align:center;color:var(--muted)}
+@media(max-width:760px){.sidebar{width:64px}.sidebar h2,.sidebar .navbtn span,.sidebar .who{display:none}.navbtn{justify-content:center;padding:14px 0}.main{padding:18px}.f2{grid-template-columns:1fr}}
+
+/* orders */
+.status-pill{display:inline-block;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:800}
+.st-pending{background:#fff3cd;color:#856404}.st-confirmed{background:#cce5ff;color:#004085}.st-shipped{background:#d4edda;color:#155724}.st-delivered{background:#d1ecf1;color:#0c5460}.st-cancelled{background:#f8d7da;color:#721c24}
+.status-select{padding:7px 10px;border:1px solid var(--line);border-radius:6px;font-weight:700;font-size:13px;background:#fff}
+.ord-detail{font-size:14px;line-height:1.7}
+.ord-items{margin:10px 0;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.ord-item{display:flex;justify-content:space-between;gap:10px;padding:9px 13px;border-bottom:1px solid var(--line);font-size:13px}
+.ord-item:last-child{border-bottom:0}
+.filterbar{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center}
+.filterbar select{padding:9px 12px;border:1px solid var(--line);border-radius:8px;font-size:14px}
+
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-wrap" id="loginView">
+  <div class="login-card">
+    <h1>🛍️ Tihar Bazaar</h1>
+    <p>Admin Panel — sirf owner ke liye</p>
+    <button class="gbtn" id="googleLoginBtn" type="button">
+      <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M5.84 14.1a6.6 6.6 0 0 1 0-4.2V7.06H2.18a11 11 0 0 0 0 9.88l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15A11 11 0 0 0 2.18 7.06l3.66 2.84C6.71 7.31 9.14 5.38 12 5.38z"/></svg>
+      Google se Login karein
+    </button>
+    <div class="login-err" id="loginErr"></div>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div class="admin" id="adminView" hidden>
+  <aside class="sidebar">
+    <h2>🛍️ Admin</h2>
+    <nav>
+      <button class="navbtn active" data-view="dashboard" type="button">📊 <span>Dashboard</span></button>
+      <button class="navbtn" data-view="products" type="button">📦 <span>Products</span></button>
+      <button class="navbtn" data-view="categories" type="button">🗂️ <span>Categories</span></button>
+      <button class="navbtn" data-view="orders" type="button">🧾 <span>Orders</span></button>
+      <button class="navbtn" data-view="suppliers" type="button">🏭 <span>Suppliers</span></button>
+      <button class="navbtn" data-view="settings" type="button">⚙️ <span>Settings</span></button>
+      <button class="navbtn" data-view="import" type="button">📥 <span>Import</span></button>
+      <button class="navbtn" data-view="roles" type="button">👥 <span>Roles</span></button>
+      <button class="navbtn" data-view="users" type="button">👤 <span>Users</span></button>
+      <button class="navbtn" data-view="audit" type="button">📝 <span>Audit Log</span></button>
+      <button class="navbtn" data-view="notify" type="button">🔔 <span>Notifications</span></button>
+      <button class="navbtn" data-view="reports" type="button">📈 <span>Reports</span></button>
+    </nav>
+    <div class="who"><div id="adminEmail"></div><button id="logoutBtn" type="button">Logout</button></div>
+  </aside>
+  <main class="main">
+    <!-- DASHBOARD -->
+    <section class="view active" id="view-dashboard">
+      <h1>Dashboard</h1><div class="sub">Dukaan ka haal ek nazar me</div>
+      <div class="cards">
+        <div class="stat"><div class="n" id="stTotal">–</div><div class="l">Kul products</div></div>
+        <div class="stat"><div class="n" id="stIn" style="color:var(--green)">–</div><div class="l">Stock me</div></div>
+        <div class="stat"><div class="n" id="stOut" style="color:var(--red)">–</div><div class="l">Stock khatm</div></div>
+        <div class="stat"><div class="n" id="stCats">–</div><div class="l">Categories</div></div>
+      </div>
+      <div class="cards">
+        <div class="stat"><div class="n" id="stValue">–</div><div class="l">Stock value (selling price)</div></div>
+        <div class="stat"><div class="n" id="stProfit" style="color:var(--blue)">–</div><div class="l">Expected profit (10%)</div></div>
+      </div>
+      <h2 style="margin:22px 0 10px;font-size:18px">🔔 Alerts</h2>
+      <div class="cards" id="alertCards">
+        <div class="stat" id="alOrders" style="cursor:pointer"><div class="n" id="stPendOrd" style="color:var(--red)">–</div><div class="l">Pending orders</div></div>
+        <div class="stat" id="alPay" style="cursor:pointer"><div class="n" id="stUnverPay" style="color:#b06000">–</div><div class="l">Unverified payments</div></div>
+        <div class="stat"><div class="n" id="stSup" style="color:var(--blue)">–</div><div class="l">Suppliers</div></div>
+      </div>
+    </section>
+    <!-- PRODUCTS -->
+    <section class="view" id="view-products">
+      <h1>Products</h1><div class="sub">Add, edit, delete — sab kuch yahin se</div>
+      <div class="toolbar">
+        <input type="text" id="prodSearch" placeholder="🔍 Product khojo...">
+        <button class="btn btn-pri" id="addProdBtn" type="button">+ Naya Product</button>
+      </div>
+      <div class="tblwrap"><table>
+        <thead><tr><th>Photo</th><th>Naam</th><th>Category</th><th>Supplier ₹</th><th>Selling ₹</th><th>Margin</th><th>Stock</th><th></th></tr></thead>
+        <tbody id="prodRows"><tr><td colspan="8" class="empty">Loading...</td></tr></tbody>
+      </table></div>
+    </section>
+    <!-- CATEGORIES -->
+    <section class="view" id="view-categories">
+      <h1>Categories</h1><div class="sub">Product shreniyan</div>
+      <div class="toolbar">
+        <input type="text" id="catName" placeholder="Nayi category ka naam...">
+        <button class="btn btn-pri" id="addCatBtn" type="button">+ Add Category</button>
+      </div>
+      <div class="tblwrap"><table>
+        <thead><tr><th>Naam</th><th>Products</th><th></th></tr></thead>
+        <tbody id="catRows"><tr><td colspan="3" class="empty">Loading...</td></tr></tbody>
+      </table></div>
+    </section>
+    <!-- SUPPLIERS -->
+    <section class="view" id="view-suppliers">
+      <h1>Suppliers</h1><div class="sub">Samaan kahan se aata hai — sabka hisaab</div>
+      <div class="toolbar">
+        <button class="btn btn-pri" id="addSupBtn" type="button">+ Naya Supplier</button>
+      </div>
+      <div class="tblwrap"><table>
+        <thead><tr><th>Naam</th><th>Phone / WhatsApp</th><th>Products</th><th></th></tr></thead>
+        <tbody id="supRows"><tr><td colspan="4" class="empty">Loading...</td></tr></tbody>
+      </table></div>
+    </section>
+    <!-- SETTINGS -->
+    <section class="view" id="view-settings">
+      <h1>Settings</h1><div class="sub">Payment IDs — ग्राहक इन्हीं पर पेमेंट भेजेंगे</div>
+      <div style="max-width:480px">
+        <div class="frow" style="margin-bottom:14px"><label>📱 eSewa ID / Number</label><input id="setEsewa" type="text" placeholder="eSewa ID ya mobile number" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:8px"></div>
+        <div class="frow" style="margin-bottom:14px"><label>💜 Khalti ID / Number</label><input id="setKhalti" type="text" placeholder="Khalti ID ya mobile number" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:8px"></div>
+        <button class="btn btn-pri" id="saveSettings" type="button">💾 Save Karo</button>
+        <p class="hint" style="margin-top:10px">Khali chhodo to customer ko WhatsApp par details lene ko kaha jayega.</p>
+      </div>
+    </section>
+    <!-- ORDERS -->
+    <section class="view" id="view-orders">
+      <h1>Orders</h1><div class="sub">Grahak orders — status update karo</div>
+      <div class="filterbar">
+        <select id="orderFilter"><option value="all">Sabhi orders</option><option value="pending">Pending</option><option value="confirmed">Confirmed</option><option value="shipped">Shipped</option><option value="delivered">Delivered</option><option value="cancelled">Cancelled</option></select>
+        <button class="btn" id="refreshOrders" type="button">🔄 Refresh</button>
+      </div>
+      <div class="tblwrap"><table>
+        <thead><tr><th>Order ID</th><th>Date</th><th>Customer</th><th>Items</th><th>Total</th><th>Payment</th><th>Status</th><th></th></tr></thead>
+        <tbody id="orderRows"><tr><td colspan="8" class="empty">Loading...</td></tr></tbody>
+      </table></div>
+    </section>
+    <!-- IMPORT -->
+    <section class="view" id="view-import">
+      <div style="margin-bottom:20px;padding:16px;background:#f0faf2;border-radius:8px;border:1px solid #c8e6c9;">
+        <h3 style="margin:0 0 10px;">🖼️ Product Images Update</h3>
+        <p style="margin:0 0 10px;color:#666;font-size:14px;">1539 products ki images ek click me update karo</p>
+        <button class="btn btn-pri" id="updateImagesBtn" type="button">🖼️ Images Update Karo</button>
+        <div id="imgUpdateStatus" style="margin-top:10px;font-size:14px;"></div>
+      </div>
+      <h1>Import</h1><div class="sub">Ek saath hazaaron products lao</div>
+      <div class="seedbox">
+        <h3>🌱 Pehli baar setup</h3>
+        <p>Website ke 77 maujooda products ko database me lao. Sirf ek baar karna hai.</p>
+        <button class="btn btn-green" id="seedBtn" type="button">77 Products Import Karo</button>
+      </div>
+      <div class="drop" id="csvDrop">
+        <p style="font-size:16px;margin-bottom:8px">📄 <b>CSV file</b> yahan drop karo ya click karke chuno</p>
+        <p style="font-size:13px;color:var(--muted)">Format: naam, category, supplier_price, image, description (pehli line header)</p>
+        <input type="file" id="csvFile" accept=".csv">
+      </div>
+      <div class="preview" id="csvPreview" hidden>
+        <h3 style="margin-bottom:12px">Preview — <span id="csvCount"></span> products</h3>
+        <div class="tblwrap"><table>
+          <thead><tr><th>Naam</th><th>Category</th><th>Supplier ₹</th><th>Selling ₹ (auto +10%)</th></tr></thead>
+          <tbody id="csvRows"></tbody>
+        </table></div>
+        <div style="margin-top:14px;display:flex;gap:10px">
+          <button class="btn btn-pri" id="csvImportBtn" type="button">Import Karo</button>
+          <button class="btn btn-sec" id="csvCancelBtn" type="button">Cancel</button>
+        </div>
+      </div>
+    </section>
+    <!-- ROLES -->
+    <section class="view" id="view-roles">
+      <h1>Roles & Permissions</h1><div class="sub">Kaun kya kar sakta hai</div>
+      <div class="toolbar">
+        <input type="text" id="roleName" placeholder="Naye role ka naam...">
+        <input type="email" id="roleEmail" placeholder="User ka email...">
+        <button class="btn btn-pri" id="addRoleBtn" type="button">+ Add Role</button>
+      </div>
+      <div class="tblwrap"><table>
+        <thead><tr><th>Role</th><th>Email</th><th>Permissions</th><th></th></tr></thead>
+        <tbody id="roleRows"><tr><td colspan="4" class="empty">Loading...</td></tr></tbody>
+      </table></div>
+      <div style="margin-top:20px;padding:16px;background:#f8f9fa;border-radius:8px;">
+        <h3 style="margin:0 0 10px;">Default Roles</h3>
+        <table>
+          <thead><tr><th>Role</th><th>Kar sakta hai</th><th>Nahi kar sakta</th></tr></thead>
+          <tbody>
+            <tr><td><b>Super Admin</b></td><td>Sab kuch</td><td>—</td></tr>
+            <tr><td><b>Operations</b></td><td>Products, Categories, Orders</td><td>Payments, Settings</td></tr>
+            <tr><td><b>Finance</b></td><td>Payments, Reports</td><td>Products, Users</td></tr>
+            <tr><td><b>Marketing</b></td><td>Banners, Notifications</td><td>Payments, Users</td></tr>
+            <tr><td><b>Support</b></td><td>Orders dekhna</td><td>Refund, Delete</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+    <!-- USERS -->
+    <section class="view" id="view-users">
+      <h1>User Management</h1><div class="sub">Customer ko dekho, block karo</div>
+      <div class="toolbar">
+        <input type="text" id="userSearch" placeholder="Email ya naam se khojo...">
+        <button class="btn btn-pri" id="searchUserBtn" type="button">🔍 Khojo</button>
+      </div>
+      <div class="tblwrap"><table>
+        <thead><tr><th>Naam</th><th>Email</th><th>Orders</th><th>Status</th><th></th></tr></thead>
+        <tbody id="userRows"><tr><td colspan="5" class="empty">Loading...</td></tr></tbody>
+      </table></div>
+    </section>
+    <!-- AUDIT LOG -->
+    <section class="view" id="view-audit">
+      <h1>Audit Log</h1><div class="sub">Kisne kab kya kiya - poora hisaab</div>
+      <div class="toolbar">
+        <input type="text" id="auditSearch" placeholder="Action ya user se khojo...">
+        <button class="btn btn-pri" id="searchAuditBtn" type="button">🔍 Khojo</button>
+        <button class="btn btn-sec" id="clearAuditBtn" type="button">🗑️ Purana saaf karo</button>
+      </div>
+      <div class="tblwrap"><table>
+        <thead><tr><th>Time</th><th>User</th><th>Action</th><th>Details</th></tr></thead>
+        <tbody id="auditRows"><tr><td colspan="4" class="empty">Loading...</td></tr></tbody>
+      </table></div>
+    </section>
+    <!-- NOTIFICATIONS -->
+    <section class="view" id="view-notify">
+      <h1>Notifications</h1><div class="sub">Customer ko message bhejo</div>
+      <div style="max-width:600px;">
+        <div class="toolbar" style="flex-direction:column;align-items:stretch;gap:10px;">
+          <input type="text" id="notifTitle" placeholder="Title... (jaise: Diwali Offer!)">
+          <textarea id="notifMsg" rows="4" placeholder="Message likho..." style="padding:10px;border:1px solid var(--line);border-radius:6px;font-size:14px;"></textarea>
+          <select id="notifTarget" style="padding:10px;border:1px solid var(--line);border-radius:6px;font-size:14px;">
+            <option value="all">Sabhi customers</option>
+            <option value="active">Active customers (pichhle 30 din me order)</option>
+          </select>
+          <button class="btn btn-pri" id="sendNotifBtn" type="button">📢 Bhejo</button>
+        </div>
+      </div>
+      <h3 style="margin-top:24px;">Bheji gayi notifications</h3>
+      <div class="tblwrap"><table>
+        <thead><tr><th>Time</th><th>Title</th><th>Message</th><th>Target</th></tr></thead>
+        <tbody id="notifRows"><tr><td colspan="4" class="empty">Loading...</td></tr></tbody>
+      </table></div>
+    </section>
+    <!-- REPORTS -->
+    <section class="view" id="view-reports">
+      <h1>Reports</h1><div class="sub">Sale ki report nikalo</div>
+      <div class="toolbar">
+        <select id="reportType" style="padding:10px;border:1px solid var(--line);border-radius:6px;font-size:14px;">
+          <option value="sales">Sales Report</option>
+          <option value="products">Product Report</option>
+          <option value="orders">Order Report</option>
+        </select>
+        <select id="reportRange" style="padding:10px;border:1px solid var(--line);border-radius:6px;font-size:14px;">
+          <option value="7">Pichhle 7 din</option>
+          <option value="30">Pichhle 30 din</option>
+          <option value="90">Pichhle 90 din</option>
+          <option value="all">Sabhi</option>
+        </select>
+        <button class="btn btn-pri" id="genReportBtn" type="button">📊 Report banao</button>
+        <button class="btn btn-sec" id="dlReportBtn" type="button">⬇️ Excel download</button>
+      </div>
+      <div id="reportSummary" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:16px 0;"></div>
+      <div class="tblwrap"><table>
+        <thead><tr id="reportHead"><th>Data</th></tr></thead>
+        <tbody id="reportRows"><tr><td class="empty">Upar se report banao.</td></tr></tbody>
+      </table></div>
+    </section>
+  </main>
+</div>
+
+<!-- PRODUCT MODAL -->
+<div class="modal-shade" id="prodModal">
+  <div class="modal">
+    <h2 id="modalTitle">Naya Product</h2>
+    <div class="frow"><label>Naam (Hindi) *</label><input id="fName" type="text" placeholder="e.g. रंगीन परदा लाइट"></div>
+    <div class="frow"><label>Naam (English)</label><input id="fNameEn" type="text" placeholder="e.g. Colorful Curtain Light"></div>
+    <div class="f2">
+      <div class="frow"><label>Category *</label><select id="fCat"></select></div>
+      <div class="frow"><label>Tag</label><select id="fTag"><option value="">—</option><option>नया</option><option>लोकप्रिय</option><option>बेस्टसेलर</option></select></div>
+    </div>
+    <div class="frow"><label>Supplier</label><select id="fSupplier"><option value="">— Koi nahi —</option></select><div class="hint">Samaan kahan se aata hai</div></div>
+    <div class="f2">
+      <div class="frow"><label>Supplier Price (₹) *</label><input id="fSupPrice" type="number" min="0" placeholder="e.g. 450"><div class="hint">Company/supplier ka rate</div></div>
+      <div class="frow"><label>Selling Price (₹)</label><input id="fPrice" type="number" min="0" placeholder="auto"><div class="hint">Khali chhodo to +10% auto</div></div>
+    </div>
+    <div class="calc" id="marginCalc" hidden>Selling: <b id="calcSell"></b> &nbsp;•&nbsp; Tumhara profit: <b id="calcProfit"></b> (10%)</div>
+    <div class="f2">
+      <div class="frow"><label>Stock</label><select id="fStock"><option value="in_stock">✅ Stock me hai</option><option value="out_of_stock">❌ Khatm</option></select></div>
+      <div class="frow"><label>Image</label><input id="fImage" type="text" placeholder="assets/photo.jpg ya https://..."><div class="hint">Nayi photo GitHub assets me upload karo, phir naam likho</div></div>
+    </div>
+    <div class="frow"><label>Description</label><textarea id="fDesc" placeholder="Product ke baare me..."></textarea></div>
+    <div class="mclose">
+      <button class="btn btn-sec" id="modalCancel" type="button">Cancel</button>
+      <button class="btn btn-pri" id="modalSave" type="button">Save Karo</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-shade" id="confirmModal">
+  <div class="modal" style="max-width:420px;text-align:center">
+    <h2 style="font-size:18px" id="confirmMsg"></h2>
+    <div class="mclose" style="justify-content:center">
+      <button class="btn btn-sec" id="confirmNo" type="button">Nahi</button>
+      <button class="btn btn-pri" id="confirmYes" type="button">Haan, Karo</button>
+    </div>
+  </div>
+</div>
+<!-- SUPPLIER MODAL -->
+<div class="modal-shade" id="supModal">
+  <div class="modal">
+    <h2 id="supModalTitle">Naya Supplier</h2>
+    <div class="frow" style="margin-bottom:12px"><label>Supplier Naam *</label><input id="sName" type="text" placeholder="ABC Suppliers" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:8px"></div>
+    <div class="frow" style="margin-bottom:12px"><label>Contact Person</label><input id="sPerson" type="text" placeholder="Naam" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:8px"></div>
+    <div class="frow" style="margin-bottom:12px"><label>Phone</label><input id="sPhone" type="text" placeholder="98XXXXXXXX" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:8px"></div>
+    <div class="frow" style="margin-bottom:12px"><label>WhatsApp</label><input id="sWa" type="text" placeholder="98XXXXXXXX" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:8px"></div>
+    <div class="frow" style="margin-bottom:12px"><label>Address</label><input id="sAddr" type="text" placeholder="Kathmandu" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:8px"></div>
+    <div class="frow" style="margin-bottom:12px"><label>Notes</label><textarea id="sNotes" placeholder="Rate list, delivery time..." style="width:100%;padding:10px;border:1px solid var(--line);border-radius:8px"></textarea></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button class="btn btn-sec" id="supCancel" type="button">Cancel</button>
+      <button class="btn btn-pri" id="supSave" type="button">Save Karo</button>
+    </div>
+  </div>
+</div>
+<!-- ORDER DETAIL MODAL -->
+<div class="modal-shade" id="orderModal">
+  <div class="modal">
+    <h2 id="orderModalTitle">Order</h2>
+    <div class="ord-detail" id="orderDetailBody"></div>
+    <div style="display:flex;gap:10px;margin-top:18px;justify-content:flex-end">
+      <button class="btn btn-pri" id="verifyPayBtn" type="button" style="display:none">✓ Payment Verify Karo</button>
+      <button class="btn" id="orderModalClose" type="button">Band karo</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+
+<script>
+/* ============ CONFIG ============ */
+const firebaseConfig = {
+  apiKey: "AIzaSyCZjMeOhvKqh1xPmtJSdW9fH7ucWu4Wxfk",
+  authDomain: "tihar-bazaar.firebaseapp.com",
+  projectId: "tihar-bazaar",
+  storageBucket: "tihar-bazaar.firebasestorage.app",
+  messagingSenderId: "971542486073",
+  appId: "1:971542486073:web:9d26231c4e0706e3cac1e8"
+};
+const ADMIN_EMAIL = "kauroa692@gmail.com";
+const MARGIN = 0.10; // 10%
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+/* ============ HELPERS ============ */
+const $ = id => document.getElementById(id);
+const money = n => n == null ? "—" : "₹" + Number(n).toLocaleString("en-IN");
+function toast(msg){ const t=$("toast"); t.textContent=msg; t.classList.add("show"); setTimeout(()=>t.classList.remove("show"),2600); }
+function confirmDlg(msg){
+  return new Promise(res => {
+    $("confirmMsg").textContent = msg;
+    $("confirmModal").classList.add("open");
+    const done = v => { $("confirmModal").classList.remove("open");
+      $("confirmYes").onclick = $("confirmNo").onclick = null; res(v); };
+    $("confirmYes").onclick = () => done(true);
+    $("confirmNo").onclick = () => done(false);
+  });
+}
+const sellPrice = sup => sup == null || sup === "" ? null : Math.round(Number(sup) * (1 + MARGIN));
+
+/* ============ AUTH ============ */
+$("googleLoginBtn").onclick = () => {
+  $("loginErr").textContent = "";
+  const provider = new firebase.auth.GoogleAuthProvider();
+  auth.signInWithPopup(provider).catch(e => { $("loginErr").textContent = "Login fail: " + e.message; });
+};
+$("logoutBtn").onclick = () => auth.signOut();
+
+auth.onAuthStateChanged(user => {
+  if (user && user.email === ADMIN_EMAIL) {
+    $("loginView").style.display = "none";
+    $("adminView").hidden = false;
+    $("adminEmail").textContent = user.email;
+    boot();
+  } else if (user) {
+    $("loginErr").textContent = "⛔ Ye account admin nahi hai.";
+    auth.signOut();
+  } else {
+    $("loginView").style.display = "grid";
+    $("adminView").hidden = true;
+  }
+});
+
+/* ============ NAV ============ */
+document.querySelectorAll(".navbtn").forEach(b => b.onclick = () => {
+  document.querySelectorAll(".navbtn").forEach(x => x.classList.remove("active"));
+  document.querySelectorAll(".view").forEach(x => x.classList.remove("active"));
+  b.classList.add("active");
+  $("view-" + b.dataset.view).classList.add("active");
+  if (b.dataset.view === "roles") loadRoles();
+  if (b.dataset.view === "users") loadUsers();
+  if (b.dataset.view === "audit") loadAudit();
+  if (b.dataset.view === "notify") loadNotifs();
+});
+
+/* ============ DATA ============ */
+let products = [], categories = [], editingId = null;
+
+async function boot(){
+  await loadCategories();
+  await loadProducts();
+  renderDashboard();
+  await loadOrders();
+  await loadSuppliers();
+  await loadPaySettings();
+  document.getElementById("saveSettings").onclick = savePaySettings;
+  document.getElementById("orderFilter").onchange = renderOrders;
+  document.getElementById("refreshOrders").onclick = loadOrders;
+  document.getElementById("addSupBtn").onclick = () => openSupModal(null);
+  document.getElementById("supCancel").onclick = () => document.getElementById("supModal").classList.remove("open");
+  document.getElementById("supSave").onclick = saveSupplier;
+  document.getElementById("supModal").addEventListener("click", e => { if (e.target.id === "supModal") e.target.classList.remove("open"); });
+  document.getElementById("orderModalClose").onclick = () => document.getElementById("orderModal").classList.remove("open");
+  document.getElementById("orderModal").addEventListener("click", e => { if (e.target.id === "orderModal") e.target.classList.remove("open"); });
+}
+
+/* ============ PAYMENT SETTINGS ============ */
+async function loadPaySettings(){
+  try {
+    const d = await db.collection("settings").doc("payments").get();
+    if(d.exists){
+      const s = d.data();
+      document.getElementById("setEsewa").value = s.esewaId || "";
+      document.getElementById("setKhalti").value = s.khaltiId || "";
+    }
+  } catch(e){}
+}
+async function savePaySettings(){
+  try {
+    await db.collection("settings").doc("payments").set({
+      esewaId: document.getElementById("setEsewa").value.trim(),
+      khaltiId: document.getElementById("setKhalti").value.trim(),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+    toast("✅ Payment settings save ho gayi");
+  } catch(e){ toast("❌ Save nahi hua"); }
+}
+
+/* ============ SUPPLIERS ============ */
+let suppliers = [], editingSupId = null;
+
+async function loadSuppliers(){
+  try {
+    const snap = await db.collection("suppliers").orderBy("name").get();
+    suppliers = snap.docs.map(d => Object.assign({ _id: d.id }, d.data()));
+  } catch(e){ suppliers = []; }
+  renderSuppliers();
+  fillSupplierDropdown();
+}
+
+function fillSupplierDropdown(){
+  const sel = document.getElementById("fSupplier");
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">— Koi nahi —</option>' + suppliers.map(s => `<option value="${s._id}">${s.name}</option>`).join("");
+  if(cur) sel.value = cur;
+}
+
+function renderSuppliers(){
+  const tb = document.getElementById("supRows");
+  if(!suppliers.length){ tb.innerHTML = '<tr><td colspan="4" class="empty">Koi supplier nahi. + Naya Supplier dabao.</td></tr>'; return; }
+  tb.innerHTML = suppliers.map(s => {
+    const count = products.filter(pr => pr.supplierId === s._id).length;
+    const contact = [s.phone, s.whatsapp].filter(Boolean).join(" / ") || "–";
+    return `<tr>
+      <td><b>${s.name}</b>${s.contactPerson?`<br><small style="color:var(--muted)">${s.contactPerson}</small>`:""}</td>
+      <td style="white-space:nowrap">${contact}</td>
+      <td>${count} products</td>
+      <td style="white-space:nowrap">
+        <button class="btn btn-sec" data-sedit="${s._id}" type="button">✏️</button>
+        <button class="btn btn-sec" data-sdel="${s._id}" type="button" style="color:var(--red)">🗑️</button>
+      </td>
+    </tr>`;
+  }).join("");
+  tb.querySelectorAll("[data-sedit]").forEach(b => b.onclick = () => openSupModal(b.dataset.sedit));
+  tb.querySelectorAll("[data-sdel]").forEach(b => b.onclick = () => deleteSupplier(b.dataset.sdel));
+}
+
+function openSupModal(id){
+  editingSupId = id || null;
+  const s = id ? suppliers.find(x => x._id === id) : null;
+  document.getElementById("supModalTitle").textContent = s ? "Supplier Edit Karo" : "Naya Supplier";
+  document.getElementById("sName").value = s ? s.name || "" : "";
+  document.getElementById("sPerson").value = s ? s.contactPerson || "" : "";
+  document.getElementById("sPhone").value = s ? s.phone || "" : "";
+  document.getElementById("sWa").value = s ? s.whatsapp || "" : "";
+  document.getElementById("sAddr").value = s ? s.address || "" : "";
+  document.getElementById("sNotes").value = s ? s.notes || "" : "";
+  document.getElementById("supModal").classList.add("open");
+}
+
+async function saveSupplier(){
+  const name = document.getElementById("sName").value.trim();
+  if(!name){ toast("❌ Naam likho"); return; }
+  const data = {
+    name: name,
+    contactPerson: document.getElementById("sPerson").value.trim(),
+    phone: document.getElementById("sPhone").value.trim(),
+    whatsapp: document.getElementById("sWa").value.trim(),
+    address: document.getElementById("sAddr").value.trim(),
+    notes: document.getElementById("sNotes").value.trim(),
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  };
+  try {
+    if(editingSupId){
+      await db.collection("suppliers").doc(editingSupId).update(data);
+      toast("✅ Supplier update ho gaya");
+    } else {
+      data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+      await db.collection("suppliers").add(data);
+      toast("✅ Supplier add ho gaya");
+    }
+    document.getElementById("supModal").classList.remove("open");
+    await loadSuppliers();
+  } catch(e){ toast("❌ Save nahi hua"); }
+}
+
+async function deleteSupplier(id){
+  const s = suppliers.find(x => x._id === id);
+  if(!s) return;
+  const linked = products.filter(pr => pr.supplierId === id).length;
+  const msg = linked
+    ? `${s.name} delete karna hai? ${linked} products isse jude hain (unka supplier hat jayega).`
+    : `${s.name} delete karna hai? Ye wapas nahi aayega.`;
+  if(!(await confirmDlg(msg))) return;
+  try {
+    await db.collection("suppliers").doc(id).delete();
+    // unlink products
+    const batch = db.batch();
+    products.filter(pr => pr.supplierId === id).forEach(pr => {
+      batch.update(db.collection("products").doc(pr._id), { supplierId: null, supplierName: null });
+      pr.supplierId = null; pr.supplierName = null;
+    });
+    await batch.commit();
+    toast("🗑️ Supplier delete ho gaya");
+    await loadSuppliers();
+  } catch(e){ toast("❌ Delete nahi hua"); }
+}
+
+/* ============ ORDERS ============ */
+let orders = [];
+const ORDER_STATUSES = ["pending","confirmed","shipped","delivered","cancelled"];
+const STATUS_HI = { pending:"Pending", confirmed:"Confirmed", shipped:"Shipped", delivered:"Delivered", cancelled:"Cancelled" };
+
+async function loadOrders(){
+  try {
+    const snap = await db.collection("orders").get();
+    orders = snap.docs.map(d => Object.assign({ _id: d.id }, d.data()));
+    orders.sort((a,b) => {
+      const ta = a.createdAt && a.createdAt.toMillis ? a.createdAt.toMillis() : 0;
+      const tb = b.createdAt && b.createdAt.toMillis ? b.createdAt.toMillis() : 0;
+      return tb - ta;
+    });
+  } catch(e) { orders = []; }
+  renderOrders();
+  try { renderDashboard(); } catch(e){}
+}
+
+function fmtDate(ts){
+  try {
+    const d = ts && ts.toDate ? ts.toDate() : null;
+    return d ? d.toLocaleString("en-GB", { day:"2-digit", month:"short", hour:"2-digit", minute:"2-digit" }) : "–";
+  } catch(e){ return "–"; }
+}
+
+function payCellHtml(o){
+  const m = o.paymentMethod || "cod";
+  const name = m === "esewa" ? "📱 eSewa" : m === "khalti" ? "💜 Khalti" : "💵 COD";
+  let st = "";
+  if(m !== "cod") st = o.paymentStatus === "verified" ? '<br><span class="status-pill st-delivered">✓ Verified</span>' : '<br><span class="status-pill st-pending">⏳ Unverified</span>';
+  const ref = o.paymentRef ? `<br><small style="color:var(--muted)">Ref: ${o.paymentRef}</small>` : "";
+  return name + st + ref;
+}
+function renderOrders(){
+  const f = document.getElementById("orderFilter").value;
+  const list = orders.filter(o => f === "all" || o.status === f);
+  const tb = document.getElementById("orderRows");
+  if(!list.length){ tb.innerHTML = '<tr><td colspan="8" class="empty">Koi order nahi mila.</td></tr>'; return; }
+  tb.innerHTML = list.map(o => {
+    const items = (o.items || []).map(it => `${it.name||"#"+it.id} × ${it.qty||1}`).join(", ");
+    const opts = ORDER_STATUSES.map(s => `<option value="${s}"${s===o.status?" selected":""}>${STATUS_HI[s]}</option>`).join("");
+    return `<tr>
+      <td><b>${o.orderId||o._id}</b></td>
+      <td style="white-space:nowrap">${fmtDate(o.createdAt)}</td>
+      <td>${esc(o.customerName)||"–"}<br><small style="color:var(--muted)">${esc(o.customerPhone)}</small></td>
+      <td style="max-width:220px"><small>${items||"–"}</small></td>
+      <td><b>₹${o.subtotal!=null?o.subtotal:"?"}</b></td>
+      <td>${payCellHtml(o)}</td>
+      <td><select class="status-select" data-oid="${o._id}">${opts}</select></td>
+      <td style="white-space:nowrap"><button class="btn btn-sec" data-view-ord="${o._id}" type="button">👁️</button> <button class="btn btn-sec" data-del-ord="${o._id}" type="button" style="color:var(--red)">🗑️</button></td>
+    </tr>`;
+  }).join("");
+  tb.querySelectorAll(".status-select").forEach(s => s.onchange = () => updateOrderStatus(s.dataset.oid, s.value));
+  tb.querySelectorAll("[data-view-ord]").forEach(b => b.onclick = () => showOrderDetail(b.dataset.viewOrd));
+  tb.querySelectorAll("[data-del-ord]").forEach(b => b.onclick = () => deleteOrder(b.dataset.delOrd));
+}
+
+async function updateOrderStatus(docId, status){
+  try {
+    await db.collection("orders").doc(docId).update({ status: status, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    const o = orders.find(x => x._id === docId);
+    if(o) o.status = status;
+    toast("✅ Status: " + STATUS_HI[status]);
+    renderOrders();
+  } catch(e){ toast("❌ Update nahi hua"); }
+}
+
+async function deleteOrder(docId){
+  const o = orders.find(x => x._id === docId);
+  if(!o) return;
+  if(!(await confirmDlg(`Order ${o.orderId||docId} delete karna hai? Ye wapas nahi aayega.`))) return;
+  try {
+    await db.collection("orders").doc(docId).delete();
+    orders = orders.filter(x => x._id !== docId);
+    toast("🗑️ Order delete ho gaya");
+    renderOrders();
+  } catch(e){ toast("❌ Delete nahi hua"); }
+}
+
+function showOrderDetail(docId){
+  const o = orders.find(x => x._id === docId);
+  if(!o) return;
+  document.getElementById("orderModalTitle").textContent = o.orderId || "Order";
+  const items = (o.items||[]).map(it => `<div class="ord-item"><span>${it.name||"#"+it.id} × ${it.qty||1}</span><span>${it.price!=null?"₹"+(it.price*(it.qty||1)):"price puchho"}</span></div>`).join("");
+  document.getElementById("orderDetailBody").innerHTML = `
+    <div><b>Customer:</b> ${esc(o.customerName)||"–"}</div>
+    <div><b>Phone:</b> ${esc(o.customerPhone)||"–"}</div>
+    <div><b>Address:</b> ${esc(o.customerAddress)||"–"}</div>
+    ${o.notes?`<div><b>Note:</b> ${esc(o.notes)}</div>`:""}
+    <div><b>Date:</b> ${fmtDate(o.createdAt)}</div>
+    <div><b>Payment:</b> ${o.paymentMethod==="esewa"?"📱 eSewa":o.paymentMethod==="khalti"?"💜 Khalti":"💵 Cash on Delivery"}
+      ${o.paymentMethod!=="cod"?` <span class="status-pill ${o.paymentStatus==="verified"?"st-delivered":"st-pending"}">${o.paymentStatus==="verified"?"✓ Verified":"⏳ Unverified"}</span>`:""}</div>
+    ${o.paymentRef?`<div><b>Transaction Ref:</b> ${esc(o.paymentRef)}</div>`:""}
+    <div><b>Status:</b> <span class="status-pill st-${o.status||"pending"}">${STATUS_HI[o.status]||o.status}</span></div>
+    <div class="ord-items">${items||"<div class='ord-item'>Koi item nahi</div>"}</div>
+    <div style="text-align:right;font-size:17px"><b>Total: ₹${o.subtotal!=null?o.subtotal:"?"}</b></div>`;
+  const vp = document.getElementById("verifyPayBtn");
+  const needVerify = o.paymentMethod && o.paymentMethod !== "cod" && o.paymentStatus !== "verified";
+  vp.style.display = needVerify ? "" : "none";
+  vp.onclick = () => verifyPayment(docId);
+  document.getElementById("orderModal").classList.add("open");
+}
+
+async function verifyPayment(docId){
+  try {
+    await db.collection("orders").doc(docId).update({ paymentStatus: "verified", updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    const o = orders.find(x => x._id === docId);
+    if(o) o.paymentStatus = "verified";
+    toast("✅ Payment verified");
+    document.getElementById("orderModal").classList.remove("open");
+    renderOrders();
+  } catch(e){ toast("❌ Verify nahi hua"); }
+}
+
+async function loadCategories(){
+  const snap = await db.collection("categories").orderBy("name").get();
+  categories = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  renderCategories();
+  // fill product form dropdown
+  $("fCat").innerHTML = categories.map(c => `<option value="${esc(c.name)}">${esc(c.name)}</option>`).join("") || '<option value="">—</option>';
+}
+async function loadProducts(){
+  const snap = await db.collection("products").orderBy("name").get();
+  products = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  renderProducts("");
+  renderDashboard();
+}
+function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+
+/* ============ DASHBOARD ============ */
+function renderDashboard(){
+  const inS = products.filter(p => p.stock !== "out_of_stock").length;
+  $("stTotal").textContent = products.length;
+  $("stIn").textContent = inS;
+  $("stOut").textContent = products.length - inS;
+  $("stCats").textContent = categories.length;
+  let val = 0, prof = 0;
+  products.forEach(p => { if (p.stock !== "out_of_stock" && p.price) { val += p.price; if (p.supplierPrice) prof += (p.price - p.supplierPrice); } });
+  $("stValue").textContent = money(val);
+  $("stProfit").textContent = money(prof);
+  $("stPendOrd").textContent = orders.filter(o => o.status === "pending").length;
+  $("stUnverPay").textContent = orders.filter(o => o.paymentMethod && o.paymentMethod !== "cod" && o.paymentStatus !== "verified").length;
+  $("stSup").textContent = suppliers.length;
+}
+
+document.getElementById("alOrders").onclick = () => document.querySelector('[data-view="orders"]').click();
+document.getElementById("alPay").onclick = () => { document.querySelector('[data-view="orders"]').click(); };
+
+/* ============ PRODUCTS ============ */
+function renderProducts(q){
+  q = (q || "").toLowerCase();
+  const list = products.filter(p => (p.name || "").toLowerCase().includes(q) || (p.nameEn || "").toLowerCase().includes(q));
+  $("prodRows").innerHTML = list.length ? list.map(p => `
+    <tr>
+      <td>${p.image ? `<img class="pthumb" src="${esc(imgSrc(p.image))}" onerror="this.style.display='none'">` : "—"}</td>
+      <td><b>${esc(p.name)}</b>${p.nameEn ? `<br><span style="color:var(--muted);font-size:12px">${esc(p.nameEn)}</span>` : ""}</td>
+      <td>${esc(p.category || "—")}</td>
+      <td>${money(p.supplierPrice)}</td>
+      <td><b>${p.price ? money(p.price) : "पूछें"}</b></td>
+      <td>${p.supplierPrice && p.price ? Math.round((p.price - p.supplierPrice) * 100 / p.supplierPrice) + "%" : "—"}</td>
+      <td><span class="badge ${p.stock === "out_of_stock" ? "b-out" : "b-in"}">${p.stock === "out_of_stock" ? "Khatm" : "Hai"}</span></td>
+      <td><div class="rowbtns"><button data-edit="${p.id}" type="button">Edit</button><button data-del="${p.id}" class="del" type="button">Delete</button></div></td>
+    </tr>`).join("")
+    : `<tr><td colspan="8" class="empty">Koi product nahi mila.</td></tr>`;
+  document.querySelectorAll("[data-edit]").forEach(b => b.onclick = () => openModal(b.dataset.edit));
+  document.querySelectorAll("[data-del]").forEach(b => b.onclick = () => delProduct(b.dataset.del));
+}
+function imgSrc(img){
+  if (/^https?:\/\//.test(img)) return img;
+  return img.replace(/^\//, "");
+}
+$("prodSearch").oninput = e => renderProducts(e.target.value);
+
+async function delProduct(id){
+  const p = products.find(x => x.id === id);
+  if (!(await confirmDlg(`"${p.name}" delete karna hai? Pakka?`))) return;
+  await db.collection("products").doc(id).delete();
+  toast("🗑️ Delete ho gaya");
+  loadProducts();
+}
+
+/* ---- modal ---- */
+function openModal(id){
+  editingId = id || null;
+  $("modalTitle").textContent = id ? "Product Edit Karo" : "Naya Product";
+  const p = id ? products.find(x => x.id === id) : {};
+  $("fName").value = p.name || "";
+  $("fNameEn").value = p.nameEn || "";
+  $("fCat").value = p.category || ($("fCat").options[0] ? $("fCat").options[0].value : "");
+  $("fTag").value = p.tag || "";
+  $("fSupPrice").value = p.supplierPrice == null ? "" : p.supplierPrice;
+  $("fPrice").value = p.price == null ? "" : p.price;
+  $("fStock").value = p.stock || "in_stock";
+  fillSupplierDropdown();
+  $("fSupplier").value = p.supplierId || "";
+  $("fImage").value = p.image || "";
+  $("fDesc").value = p.description || "";
+  updateCalc();
+  $("prodModal").classList.add("open");
+}
+$("addProdBtn").onclick = () => openModal(null);
+$("modalCancel").onclick = () => $("prodModal").classList.remove("open");
+$("prodModal").addEventListener("click", e => { if (e.target === $("prodModal")) $("prodModal").classList.remove("open"); });
+
+function updateCalc(){
+  const sup = Number($("fSupPrice").value);
+  if (sup > 0) {
+    const sell = $("fPrice").value ? Number($("fPrice").value) : sellPrice(sup);
+    $("calcSell").textContent = money(sell);
+    $("calcProfit").textContent = money(sell - sup);
+    $("marginCalc").hidden = false;
+  } else $("marginCalc").hidden = true;
+}
+$("fSupPrice").oninput = updateCalc;
+$("fPrice").oninput = updateCalc;
+
+$("modalSave").onclick = async () => {
+  const name = $("fName").value.trim();
+  const sup = $("fSupPrice").value === "" ? null : Number($("fSupPrice").value);
+  if (!name) { toast("⚠️ Naam likho!"); return; }
+  if (sup == null || sup < 0) { toast("⚠️ Supplier price likho!"); return; }
+  const price = $("fPrice").value === "" ? sellPrice(sup) : Number($("fPrice").value);
+  const data = {
+    name, nameEn: $("fNameEn").value.trim(),
+    category: $("fCat").value, tag: $("fTag").value,
+    supplierPrice: sup, price, marginPct: 10,
+    stock: $("fStock").value, image: $("fImage").value.trim(),
+    description: $("fDesc").value.trim(),
+    supplierId: $("fSupplier").value || null,
+    supplierName: ($("fSupplier").value && suppliers.find(s => s._id === $("fSupplier").value) || {}).name || null,
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  };
+  try {
+    if (editingId) {
+      await db.collection("products").doc(editingId).update(data);
+      toast("✅ Update ho gaya");
+    } else {
+      data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+      await db.collection("products").add(data);
+      toast("✅ Product add ho gaya!");
+    }
+    $("prodModal").classList.remove("open");
+    loadProducts();
+  } catch(e){ toast("❌ Error: " + e.message); }
+};
+
+/* ============ CATEGORIES ============ */
+function renderCategories(){
+  $("catRows").innerHTML = categories.length ? categories.map(c => {
+    const n = products.filter(p => p.category === c.name).length;
+    return `<tr><td><b>${esc(c.name)}</b></td><td>${n} products</td>
+      <td><div class="rowbtns"><button data-cdel="${c.id}" class="del" type="button">Delete</button></div></td></tr>`;
+  }).join("") : `<tr><td colspan="3" class="empty">Koi category nahi. Upar se add karo.</td></tr>`;
+  document.querySelectorAll("[data-cdel]").forEach(b => b.onclick = async () => {
+    if (!(await confirmDlg("Category delete karna hai?"))) return;
+    await db.collection("categories").doc(b.dataset.cdel).delete();
+    toast("🗑️ Category delete");
+    loadCategories();
+  });
+}
+$("addCatBtn").onclick = async () => {
+  const name = $("catName").value.trim();
+  if (!name) { toast("⚠️ Naam likho!"); return; }
+  if (categories.some(c => c.name === name)) { toast("⚠️ Ye pehle se hai!"); return; }
+  await db.collection("categories").add({ name, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+  $("catName").value = "";
+  toast("✅ Category add ho gayi!");
+  loadCategories();
+};
+
+/* ============ ROLES ============ */
+let roles = [];
+async function loadRoles() {
+  try {
+    const snap = await db.collection("roles").orderBy("createdAt", "desc").get();
+    roles = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch(e) { roles = []; }
+  $("roleRows").innerHTML = roles.length ? roles.map(r => {
+    return `<tr><td><b>${esc(r.name)}</b></td><td>${esc(r.email||"-")}</td><td>${esc((r.permissions||[]).join(", ")||"—")}</td>
+      <td><div class="rowbtns"><button data-rdel="${r.id}" class="del" type="button">Delete</button></div></td></tr>`;
+  }).join("") : `<tr><td colspan="4" class="empty">Koi role nahi. Upar se add karo.</td></tr>`;
+  document.querySelectorAll("[data-rdel]").forEach(b => b.onclick = async () => {
+    if (!(await confirmDlg("Role delete karna hai?"))) return;
+    await db.collection("roles").doc(b.dataset.rdel).delete();
+    toast("🗑️ Role delete");
+    loadRoles();
+  });
+}
+$("addRoleBtn").onclick = async () => {
+  const name = $("roleName").value.trim();
+  const email = $("roleEmail").value.trim();
+  if (!name) { toast("⚠️ Role ka naam likho!"); return; }
+  if (!email) { toast("⚠️ Email likho!"); return; }
+  await db.collection("roles").add({ name, email, permissions: [], createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+  $("roleName").value = ""; $("roleEmail").value = "";
+  toast("✅ Role add ho gaya!");
+  loadRoles();
+};
+
+/* ============ USERS ============ */
+let users = [];
+async function loadUsers(search="") {
+  try {
+    const snap = await db.collection("users").get();
+    users = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    if (search) {
+      const s = search.toLowerCase();
+      users = users.filter(u => (u.email||"").toLowerCase().includes(s) || (u.name||"").toLowerCase().includes(s));
+    }
+  } catch(e) { users = []; }
+  // Get order counts
+  let orderCounts = {};
+  try {
+    const osnap = await db.collection("orders").get();
+    osnap.docs.forEach(d => {
+      const email = d.data().email;
+      if (email) orderCounts[email] = (orderCounts[email]||0) + 1;
+    });
+  } catch(e) {}
+  $("userRows").innerHTML = users.length ? users.map(u => {
+    const blocked = u.blocked ? '<span style="color:red;font-weight:700;">Blocked</span>' : '<span style="color:green;">Active</span>';
+    const btnText = u.blocked ? "Unblock" : "Block";
+    const btnClass = u.blocked ? "btn-pri" : "del";
+    return `<tr><td><b>${esc(u.name||"-")}</b></td><td>${esc(u.email||"-")}</td><td>${orderCounts[u.email]||0}</td><td>${blocked}</td>
+      <td><div class="rowbtns"><button data-ublock="${u.id}" data-blocked="${u.blocked?1:0}" class="btn ${btnClass}" type="button">${btnText}</button></div></td></tr>`;
+  }).join("") : `<tr><td colspan="5" class="empty">Koi user nahi mila.</td></tr>`;
+  document.querySelectorAll("[data-ublock]").forEach(b => b.onclick = async () => {
+    const isBlocked = b.dataset.blocked === "1";
+    const action = isBlocked ? "unblock" : "block";
+    if (!(await confirmDlg(`User ko ${action} karna hai?`))) return;
+    await db.collection("users").doc(b.dataset.ublock).update({ blocked: !isBlocked });
+    toast(isBlocked ? "✅ User unblock ho gaya" : "🚫 User block ho gaya");
+    loadUsers($("userSearch").value.trim());
+  });
+}
+$("searchUserBtn").onclick = () => loadUsers($("userSearch").value.trim());
+$("userSearch").onkeydown = e => { if (e.key === "Enter") loadUsers($("userSearch").value.trim()); };
+
+/* ============ AUDIT LOG ============ */
+async function auditLog(action, details="") {
+  try {
+    const user = auth.currentUser;
+    await db.collection("audit_log").add({
+      action, details,
+      user: user ? user.email : "unknown",
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  } catch(e) {}
+}
+let auditEntries = [];
+async function loadAudit(search="") {
+  try {
+    const snap = await db.collection("audit_log").orderBy("createdAt", "desc").limit(200).get();
+    auditEntries = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    if (search) {
+      const s = search.toLowerCase();
+      auditEntries = auditEntries.filter(a => (a.action||"").toLowerCase().includes(s) || (a.user||"").toLowerCase().includes(s) || (a.details||"").toLowerCase().includes(s));
+    }
+  } catch(e) { auditEntries = []; }
+  $("auditRows").innerHTML = auditEntries.length ? auditEntries.map(a => {
+    let time = "-";
+    try { time = a.createdAt.toDate().toLocaleString("en-IN"); } catch(e) {}
+    return `<tr><td style="white-space:nowrap">${time}</td><td>${esc(a.user||"-")}</td><td><b>${esc(a.action||"-")}</b></td><td>${esc(a.details||"-")}</td></tr>`;
+  }).join("") : `<tr><td colspan="4" class="empty">Koi entry nahi.</td></tr>`;
+}
+$("searchAuditBtn").onclick = () => loadAudit($("auditSearch").value.trim());
+$("auditSearch").onkeydown = e => { if (e.key === "Enter") loadAudit($("auditSearch").value.trim()); };
+$("clearAuditBtn").onclick = async () => {
+  if (!(await confirmDlg("30 din se purana audit log delete karna hai?"))) return;
+  const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - 30);
+  const snap = await db.collection("audit_log").where("createdAt", "<", cutoff).get();
+  const batch = db.batch();
+  snap.docs.forEach(d => batch.delete(d.ref));
+  await batch.commit();
+  toast("🗑️ Purana log saaf ho gaya");
+  loadAudit();
+};
+
+/* ============ NOTIFICATIONS ============ */
+async function loadNotifs() {
+  try {
+    const snap = await db.collection("notifications").orderBy("createdAt", "desc").limit(50).get();
+    const list = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    $("notifRows").innerHTML = list.length ? list.map(n => {
+      let time = "-";
+      try { time = n.createdAt.toDate().toLocaleString("en-IN"); } catch(e) {}
+      return `<tr><td style="white-space:nowrap">${time}</td><td><b>${esc(n.title||"-")}</b></td><td>${esc(n.message||"-")}</td><td>${esc(n.target||"all")}</td></tr>`;
+    }).join("") : `<tr><td colspan="4" class="empty">Abhi tak koi notification nahi bheji.</td></tr>`;
+  } catch(e) {
+    $("notifRows").innerHTML = `<tr><td colspan="4" class="empty">Load nahi hua.</td></tr>`;
+  }
+}
+$("sendNotifBtn").onclick = async () => {
+  const title = $("notifTitle").value.trim();
+  const message = $("notifMsg").value.trim();
+  const target = $("notifTarget").value;
+  if (!title) { toast("⚠️ Title likho!"); return; }
+  if (!message) { toast("⚠️ Message likho!"); return; }
+  if (!(await confirmDlg(`"${title}" sabhi ko bhejna hai?`))) return;
+  await db.collection("notifications").add({
+    title, message, target,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
+  await auditLog("Notification bheji", title);
+  $("notifTitle").value = ""; $("notifMsg").value = "";
+  toast("📢 Notification save ho gayi!");
+  loadNotifs();
+};
+
+/* ============ REPORTS ============ */
+let reportData = [];
+$("genReportBtn").onclick = async () => {
+  const type = $("reportType").value;
+  const range = $("reportRange").value;
+  let cutoff = null;
+  if (range !== "all") { cutoff = new Date(); cutoff.setDate(cutoff.getDate() - parseInt(range)); }
+  $("reportRows").innerHTML = `<tr><td class="empty">Report ban rahi hai...</td></tr>`;
+  try {
+    if (type === "sales" || type === "orders") {
+      const snap = await db.collection("orders").orderBy("createdAt", "desc").get();
+      let orders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      if (cutoff) orders = orders.filter(o => { try { return o.createdAt.toDate() >= cutoff; } catch(e) { return true; } });
+      let totalRevenue = 0, totalOrders = orders.length;
+      reportData = orders.map(o => {
+        let amt = 0;
+        try { (o.items||[]).forEach(i => { amt += (i.price||0) * (i.qty||1); }); } catch(e) {}
+        totalRevenue += amt;
+        let dt = "-"; try { dt = o.createdAt.toDate().toLocaleDateString("en-IN"); } catch(e) {}
+        return { date: dt, id: o.id, customer: o.name||o.email||"-", items: (o.items||[]).length, amount: amt, status: o.status||"pending", payment: o.payMethod||o.payment||"-" };
+      });
+      const avgOrder = totalOrders ? Math.round(totalRevenue/totalOrders) : 0;
+      $("reportSummary").innerHTML = `
+        <div style="background:#f0faf2;padding:16px;border-radius:8px;"><div style="font-size:13px;color:#666;">Kul Revenue</div><div style="font-size:24px;font-weight:800;">Rs ${totalRevenue.toLocaleString("en-IN")}</div></div>
+        <div style="background:#f0f4ff;padding:16px;border-radius:8px;"><div style="font-size:13px;color:#666;">Kul Orders</div><div style="font-size:24px;font-weight:800;">${totalOrders}</div></div>
+        <div style="background:#fff8f0;padding:16px;border-radius:8px;"><div style="font-size:13px;color:#666;">Average Order</div><div style="font-size:24px;font-weight:800;">Rs ${avgOrder.toLocaleString("en-IN")}</div></div>`;
+      $("reportHead").innerHTML = `<th>Date</th><th>Order ID</th><th>Customer</th><th>Items</th><th>Amount</th><th>Status</th><th>Payment</th>`;
+      $("reportRows").innerHTML = reportData.length ? reportData.map(r =>
+        `<tr><td>${r.date}</td><td>${esc(r.id)}</td><td>${esc(r.customer)}</td><td>${r.items}</td><td>Rs ${r.amount.toLocaleString("en-IN")}</td><td>${esc(r.status)}</td><td>${esc(r.payment)}</td></tr>`
+      ).join("") : `<tr><td colspan="7" class="empty">Koi order nahi.</td></tr>`;
+    } else if (type === "products") {
+      const snap = await db.collection("products").get();
+      const prods = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      reportData = prods.map(p => ({ name: p.name||"-", category: p.category||"-", price: p.price||0, stock: p.stock||0, value: (p.price||0)*(p.stock||0) }));
+      const totalValue = reportData.reduce((s,r) => s + r.value, 0);
+      $("reportSummary").innerHTML = `
+        <div style="background:#f0faf2;padding:16px;border-radius:8px;"><div style="font-size:13px;color:#666;">Kul Products</div><div style="font-size:24px;font-weight:800;">${reportData.length}</div></div>
+        <div style="background:#f0f4ff;padding:16px;border-radius:8px;"><div style="font-size:13px;color:#666;">Stock Value</div><div style="font-size:24px;font-weight:800;">Rs ${totalValue.toLocaleString("en-IN")}</div></div>`;
+      $("reportHead").innerHTML = `<th>Product</th><th>Category</th><th>Price</th><th>Stock</th><th>Stock Value</th>`;
+      $("reportRows").innerHTML = reportData.length ? reportData.map(r =>
+        `<tr><td>${esc(r.name)}</td><td>${esc(r.category)}</td><td>Rs ${r.price.toLocaleString("en-IN")}</td><td>${r.stock}</td><td>Rs ${r.value.toLocaleString("en-IN")}</td></tr>`
+      ).join("") : `<tr><td colspan="5" class="empty">Koi product nahi.</td></tr>`;
+    }
+    await auditLog("Report banayi", type + " / " + range + " din");
+  } catch(e) {
+    $("reportRows").innerHTML = `<tr><td class="empty">Error: ${esc(e.message)}</td></tr>`;
+  }
+};
+$("dlReportBtn").onclick = () => {
+  if (!reportData.length) { toast("⚠️ Pehle report banao!"); return; }
+  const keys = Object.keys(reportData[0]);
+  const csv = [keys.join(",")].concat(reportData.map(r => keys.map(k => `"${String(r[k]).replace(/"/g,'""')}"`).join(","))).join("\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "tihar-bazaar-report-" + $("reportType").value + ".csv";
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  toast("⬇️ Report download ho gayi!");
+};
+
+/* ============ CSV IMPORT ============ */
+let csvData = [];
+$("csvDrop").onclick = () => $("csvFile").click();
+$("csvFile").onchange = e => readCSV(e.target.files[0]);
+function readCSV(file){
+  if (!file) return;
+  const r = new FileReader();
+  r.onload = () => {
+    const lines = r.result.split(/\r?\n/).filter(l => l.trim());
+    if (lines.length < 2) { toast("⚠️ CSV khali hai!"); return; }
+    csvData = [];
+    for (let i = 1; i < lines.length; i++) {
+      const cols = lines[i].split(",").map(s => s.trim());
+      if (!cols[0]) continue;
+      const sup = Number(cols[2]) || 0;
+      csvData.push({ name: cols[0], category: cols[1] || "", supplierPrice: sup, price: sellPrice(sup), image: cols[3] || "", description: cols[4] || "" });
+    }
+    if (!csvData.length) { toast("⚠️ Koi valid line nahi!"); return; }
+    $("csvCount").textContent = csvData.length;
+    $("csvRows").innerHTML = csvData.map(c =>
+      `<tr><td>${esc(c.name)}</td><td>${esc(c.category)}</td><td>${money(c.supplierPrice)}</td><td><b>${money(c.price)}</b></td></tr>`).join("");
+    $("csvPreview").hidden = false;
+    $("csvPreview").scrollIntoView({ behavior: "smooth" });
+  };
+  r.readAsText(file);
+}
+$("csvCancelBtn").onclick = () => { csvData = []; $("csvPreview").hidden = true; $("csvFile").value = ""; };
+$("csvImportBtn").onclick = async () => {
+  if (!csvData.length) return;
+  if (!(await confirmDlg(csvData.length + " products import karne hain? Pakka?"))) return;
+  $("csvImportBtn").disabled = true;
+  $("csvImportBtn").textContent = "Import ho raha hai...";
+  try {
+    const batch = db.batch();
+    const ts = firebase.firestore.FieldValue.serverTimestamp();
+    csvData.forEach(c => {
+      const ref = db.collection("products").doc();
+      batch.set(ref, { name: c.name, nameEn: "", category: c.category, tag: "", supplierPrice: c.supplierPrice, price: c.price, marginPct: 10, stock: "in_stock", image: c.image, description: c.description, createdAt: ts, updatedAt: ts });
+    });
+    await batch.commit();
+    // nayi categories bhi add karo
+    const newCats = [...new Set(csvData.map(c => c.category).filter(Boolean))].filter(n => !categories.some(x => x.name === n));
+    for (const n of newCats) await db.collection("categories").add({ name: n, createdAt: ts });
+    toast("✅ " + csvData.length + " products import ho gaye!");
+    csvData = []; $("csvPreview").hidden = true; $("csvFile").value = "";
+    loadCategories(); loadProducts();
+  } catch(e){ toast("❌ Error: " + e.message); }
+  $("csvImportBtn").disabled = false;
+  $("csvImportBtn").textContent = "Import Karo";
+};
+
+/* ============ SEED: 77 EXISTING PRODUCTS ============ */
+const SEED_PRODUCTS = [{"name": "रंगीन परदा लाइट", "nameEn": "", "category": "लाइटिंग", "tag": "बेस्टसेलर", "price": null, "supplierPrice": null, "image": "assets/093cd38fe267e826bfee7ba9.jpg"}, {"name": "महिला पारंपरिक लहंगा", "nameEn": "", "category": "पहनावा", "tag": "नया", "price": null, "supplierPrice": null, "image": "assets/1cc1fff5380b8a58aff4f82b.jpg"}, {"name": "बच्चों का एथनिक सेट", "nameEn": "", "category": "पहनावा", "tag": "लोकप्रिय", "price": null, "supplierPrice": null, "image": "assets/1d56c0972c8200dec731bc26.jpg"}, {"name": "सजावटी हैंगिंग लालटेन", "nameEn": "", "category": "सजावट", "tag": "नया", "price": null, "supplierPrice": null, "image": "assets/3ef3d1285d6f02c408b65bb9.jpg"}, {"name": "दरवाज़ा बंदनवार", "nameEn": "", "category": "सजावट", "tag": "लोकप्रिय", "price": null, "supplierPrice": null, "image": "assets/416356a9a38a14c6b01c0abf.jpg"}, {"name": "संपूर्ण पूजा सामग्री किट", "nameEn": "", "category": "पूजा", "tag": "बेस्टसेलर", "price": null, "supplierPrice": null, "image": "assets/423fe72a43ff58682e48b161.jpg"}, {"name": "पुरुष फेस्टिव कुर्ता सेट", "nameEn": "", "category": "पहनावा", "tag": "नया", "price": null, "supplierPrice": null, "image": "assets/436615a45cfdeb72c64a2682.jpg"}, {"name": "महिला प्रिंटेड अनारकली", "nameEn": "", "category": "पहनावा", "tag": "लोकप्रिय", "price": null, "supplierPrice": null, "image": "assets/50ed90c7cf71bc613f3751df.jpg"}, {"name": "मिट्टी के दीये — 40 पीस", "nameEn": "", "category": "दीये", "tag": "बेस्टसेलर", "price": null, "supplierPrice": null, "image": "assets/6ef3ca6e465dce46803ea0cc.jpg"}, {"name": "महिला एम्ब्रॉयडर्ड सूट", "nameEn": "", "category": "पहनावा", "tag": "नया", "price": null, "supplierPrice": null, "image": "assets/724ee3fee3e1febce4859314.jpg"}, {"name": "रंगोली स्टेंसिल सेट", "nameEn": "", "category": "सजावट", "tag": "लोकप्रिय", "price": null, "supplierPrice": null, "image": "assets/849ca5ab07f372e788dc2c17.jpg"}, {"name": "रंगीन फ्लावर दीया सेट", "nameEn": "", "category": "दीये", "tag": "बेस्टसेलर", "price": null, "supplierPrice": null, "image": "assets/89becf69f5048759225a06f8.jpg"}, {"name": "फ्लोटिंग दीया — 30 पीस", "nameEn": "", "category": "दीये", "tag": "लोकप्रिय", "price": null, "supplierPrice": null, "image": "assets/9aff45587d4713de3fba278e.jpg"}, {"name": "गेंदा फूल दरवाज़ा तोरण", "nameEn": "", "category": "सजावट", "tag": "नया", "price": null, "supplierPrice": null, "image": "assets/b2717f6715cb3c7c91a56ede.jpg"}, {"name": "कमल लटकन बंदनवार", "nameEn": "", "category": "सजावट", "tag": "लोकप्रिय", "price": null, "supplierPrice": null, "image": "assets/b45d7131498d60be2da34e7f.jpg"}, {"name": "स्टार पर्दा फेयरी लाइट", "nameEn": "", "category": "लाइटिंग", "tag": "बेस्टसेलर", "price": null, "supplierPrice": null, "image": "assets/c4ffb4b505b047e8ea2c81ce.jpg"}, {"name": "बच्चों का कुर्ता पायजामा", "nameEn": "", "category": "पहनावा", "tag": "नया", "price": null, "supplierPrice": null, "image": "assets/d81f8bdd89da67b4cd06be11.jpg"}, {"name": "वार्म व्हाइट कॉपर लाइट", "nameEn": "", "category": "लाइटिंग", "tag": "लोकप्रिय", "price": null, "supplierPrice": null, "image": "assets/dd4eee2226eeacf674d6adfd.jpg"}, {"name": "पीली गेंदा माला", "nameEn": "", "category": "सजावट", "tag": "बेस्टसेलर", "price": null, "supplierPrice": null, "image": "assets/f53403cae563c114c460da4c.jpg"}, {"name": "महिला फेस्टिव साड़ी", "nameEn": "", "category": "पहनावा", "tag": "नया", "price": null, "supplierPrice": null, "image": "assets/f602b1dd73b20eac4c90e41d.jpg"}, {"name": "स्पाइडर-मैन हूडी (बच्चों की)", "nameEn": "", "category": "पहनावा", "tag": "नया", "price": null, "supplierPrice": null, "image": "assets/hoodie1.jpg"}, {"name": "स्पाइडर ज़िप हूडी (बच्चों की)", "nameEn": "", "category": "पहनावा", "tag": "लोकप्रिय", "price": null, "supplierPrice": null, "image": "assets/hoodie2.jpg"}, {"name": "स्पाइडर प्रिंट हूडी", "nameEn": "", "category": "पहनावा", "tag": "नया", "price": null, "supplierPrice": null, "image": "assets/hoodie3.jpg"}, {"name": "स्पाइडर स्वेटशर्ट (बच्चों की)", "nameEn": "", "category": "पहनावा", "tag": "लोकप्रिय", "price": null, "supplierPrice": null, "image": "assets/hoodie4.jpg"}, {"name": "स्पाइडर-मैन बैक प्रिंट हूडी", "nameEn": "", "category": "पहनावा", "tag": "बेस्टसेलर", "price": null, "supplierPrice": null, "image": "assets/hoodie5.jpg"}, {"name": "स्पाइडर हूडी — फुल स्लीव", "nameEn": "", "category": "पहनावा", "tag": "नया", "price": null, "supplierPrice": null, "image": "assets/hoodie6.jpg"}, {"name": "3D स्पाइडर प्रिंट हूडी", "nameEn": "", "category": "पहनावा", "tag": "लोकप्रिय", "price": null, "supplierPrice": null, "image": "assets/hoodie7.jpg"}, {"name": "स्पाइडर कार्टून हूडी (बच्चों की)", "nameEn": "", "category": "पहनावा", "tag": "नया", "price": null, "supplierPrice": null, "image": "assets/hoodie8.jpg"}, {"name": "HP लैपटॉप 15.6 इंच", "nameEn": "HP Laptop 15.6-inch", "category": "इलेक्ट्रॉनिक्स", "tag": "लोकप्रिय", "price": 68000, "supplierPrice": null, "image": "assets/laptop-generic.jpg"}, {"name": "Dell लैपटॉप 15.6 इंच", "nameEn": "Dell Laptop 15.6-inch", "category": "इलेक्ट्रॉनिक्स", "tag": "बेस्टसेलर", "price": 72000, "supplierPrice": null, "image": "assets/laptop-generic.jpg"}, {"name": "Lenovo लैपटॉप 15.6 इंच", "nameEn": "Lenovo Laptop 15.6-inch", "category": "इलेक्ट्रॉनिक्स", "tag": "लोकप्रिय", "price": 62000, "supplierPrice": null, "image": "assets/laptop-generic.jpg"}, {"name": "Apple MacBook Air", "nameEn": "Apple MacBook Air", "category": "इलेक्ट्रॉनिक्स", "tag": "नया", "price": 145000, "supplierPrice": null, "image": "assets/macbook.jpg"}, {"name": "Asus VivoBook 15", "nameEn": "Asus VivoBook 15", "category": "इलेक्ट्रॉनिक्स", "tag": "नया", "price": 58000, "supplierPrice": null, "image": "assets/laptop-generic.jpg"}, {"name": "Samsung Galaxy A15", "nameEn": "Samsung Galaxy A15", "category": "इलेक्ट्रॉनिक्स", "tag": "लोकप्रिय", "price": 22000, "supplierPrice": null, "image": "assets/smartphone.jpg"}, {"name": "Apple iPhone 13", "nameEn": "Apple iPhone 13", "category": "इलेक्ट्रॉनिक्स", "tag": "बेस्टसेलर", "price": 95000, "supplierPrice": null, "image": "assets/smartphone.jpg"}, {"name": "Redmi Note 13", "nameEn": "Redmi Note 13", "category": "इलेक्ट्रॉनिक्स", "tag": "लोकप्रिय", "price": 24000, "supplierPrice": null, "image": "assets/smartphone.jpg"}, {"name": "Vivo Y28", "nameEn": "Vivo Y28", "category": "इलेक्ट्रॉनिक्स", "tag": "नया", "price": 19000, "supplierPrice": null, "image": "assets/smartphone.jpg"}, {"name": "Oppo A58", "nameEn": "Oppo A58", "category": "इलेक्ट्रॉनिक्स", "tag": "नया", "price": 21000, "supplierPrice": null, "image": "assets/smartphone.jpg"}, {"name": "Realme Narzo N65", "nameEn": "Realme Narzo N65", "category": "इलेक्ट्रॉनिक्स", "tag": "लोकप्रिय", "price": 18000, "supplierPrice": null, "image": "assets/smartphone.jpg"}, {"name": "Nokia 105", "nameEn": "Nokia 105", "category": "इलेक्ट्रॉनिक्स", "tag": "बेस्टसेलर", "price": 2800, "supplierPrice": null, "image": "assets/keypad-mobile.jpg"}, {"name": "Samsung Guru Music 2", "nameEn": "Samsung Guru Music 2", "category": "इलेक्ट्रॉनिक्स", "tag": "लोकप्रिय", "price": 2500, "supplierPrice": null, "image": "assets/keypad-mobile.jpg"}, {"name": "Itel it2160", "nameEn": "Itel it2160", "category": "इलेक्ट्रॉनिक्स", "tag": "नया", "price": 2200, "supplierPrice": null, "image": "assets/keypad-mobile.jpg"}, {"name": "डेस्कटॉप कंप्यूटर सेट", "nameEn": "Desktop Computer Set", "category": "इलेक्ट्रॉनिक्स", "tag": "लोकप्रिय", "price": null, "supplierPrice": null, "image": "assets/desktop-set.jpg"}, {"name": "CPU कैबिनेट", "nameEn": "CPU Cabinet", "category": "इलेक्ट्रॉनिक्स", "tag": "नया", "price": null, "supplierPrice": null, "image": "assets/cpu-cabinet.png"}, {"name": "22 इंच LED मॉनिटर", "nameEn": "22-inch LED Monitor", "category": "इलेक्ट्रॉनिक्स", "tag": "लोकप्रिय", "price": 4600, "supplierPrice": null, "image": "assets/monitor.jpg"}, {"name": "24 इंच LED मॉनिटर", "nameEn": "24-inch LED Monitor", "category": "इलेक्ट्रॉनिक्स", "tag": "नया", "price": 6200, "supplierPrice": null, "image": "assets/monitor.jpg"}, {"name": "27 इंच LED मॉनिटर", "nameEn": "27-inch LED Monitor", "category": "इलेक्ट्रॉनिक्स", "tag": "बेस्टसेलर", "price": 8500, "supplierPrice": null, "image": "assets/monitor.jpg"}, {"name": "USB कीबोर्ड", "nameEn": "USB Keyboard", "category": "इलेक्ट्रॉनिक्स", "tag": "नया", "price": null, "supplierPrice": null, "image": "assets/keyboard.jpg"}, {"name": "वायरलेस माउस", "nameEn": "Wireless Mouse", "category": "इलेक्ट्रॉनिक्स", "tag": "बेस्टसेलर", "price": null, "supplierPrice": null, "image": "assets/mouse.jpg"}, {"name": "ओवर-ईयर हेडफोन", "nameEn": "Over-ear Headphones", "category": "इलेक्ट्रॉनिक्स", "tag": "लोकप्रिय", "price": null, "supplierPrice": null, "image": "assets/overear-headphones.webp"}, {"name": "TWS ईयरबड्स", "nameEn": "TWS Earbuds", "category": "इलेक्ट्रॉनिक्स", "tag": "नया", "price": 150, "supplierPrice": null, "image": "assets/earbuds.jpg"}, {"name": "वायर्ड ईयरफोन", "nameEn": "Wired Earphones", "category": "इलेक्ट्रॉनिक्स", "tag": "बेस्टसेलर", "price": 75, "supplierPrice": null, "image": "assets/earphones-wired.jpg"}, {"name": "नेकबैंड ब्लूटूथ ईयरफोन", "nameEn": "Neckband Bluetooth Earphones", "category": "इलेक्ट्रॉनिक्स", "tag": "नया", "price": 310, "supplierPrice": null, "image": "assets/neckband.jpg"}, {"name": "TWS ईयरबड्स प्रो", "nameEn": "TWS Earbuds Pro", "category": "इलेक्ट्रॉनिक्स", "tag": "लोकप्रिय", "price": 460, "supplierPrice": null, "image": "assets/earbuds-pro.jpg"}, {"name": "USB Type-C डेटा केबल", "nameEn": "USB Type-C Data Cable", "category": "इलेक्ट्रॉनिक्स", "tag": "लोकप्रिय", "price": 40, "supplierPrice": null, "image": "assets/data-cable.jpg"}, {"name": "मोबाइल चार्जर", "nameEn": "Mobile Charger", "category": "इलेक्ट्रॉनिक्स", "tag": "नया", "price": 85, "supplierPrice": null, "image": "assets/charger-fast.jpg"}, {"name": "25W फास्ट चार्जर", "nameEn": "25W Fast Charger", "category": "इलेक्ट्रॉनिक्स", "tag": "नया", "price": 155, "supplierPrice": null, "image": "assets/charger-fast.jpg"}, {"name": "35W फास्ट चार्जर", "nameEn": "35W Fast Charger", "category": "इलेक्ट्रॉनिक्स", "tag": "लोकप्रिय", "price": 230, "supplierPrice": null, "image": "assets/charger-fast.jpg"}, {"name": "45W फास्ट चार्जर", "nameEn": "45W Fast Charger", "category": "इलेक्ट्रॉनिक्स", "tag": "नया", "price": 310, "supplierPrice": null, "image": "assets/charger-fast.jpg"}, {"name": "65W GaN फास्ट चार्जर", "nameEn": "65W GaN Fast Charger", "category": "इलेक्ट्रॉनिक्स", "tag": "बेस्टसेलर", "price": 695, "supplierPrice": null, "image": "assets/charger-gan.jpg"}, {"name": "वायरलेस चार्जर", "nameEn": "Wireless Charger", "category": "इलेक्ट्रॉनिक्स", "tag": "लोकप्रिय", "price": 460, "supplierPrice": null, "image": "assets/charger-wireless.jpg"}, {"name": "पावर बैंक", "nameEn": "Power Bank", "category": "इलेक्ट्रॉनिक्स", "tag": "लोकप्रिय", "price": null, "supplierPrice": null, "image": "assets/power-bank.jpg"}, {"name": "ब्लूटूथ स्पीकर", "nameEn": "Bluetooth Speaker", "category": "इलेक्ट्रॉनिक्स", "tag": "बेस्टसेलर", "price": null, "supplierPrice": null, "image": "assets/speaker.jpg"}, {"name": "HD वेबकैम", "nameEn": "HD Webcam", "category": "इलेक्ट्रॉनिक्स", "tag": "नया", "price": null, "supplierPrice": null, "image": "assets/webcam.jpg"}, {"name": "32 इंच स्मार्ट LED टीवी", "nameEn": "32-inch Smart LED TV", "category": "इलेक्ट्रॉनिक्स", "tag": "बेस्टसेलर", "price": 7700, "supplierPrice": null, "image": "assets/tv.jpg"}, {"name": "43 इंच स्मार्ट LED टीवी", "nameEn": "43-inch Smart LED TV", "category": "इलेक्ट्रॉनिक्स", "tag": "लोकप्रिय", "price": 11500, "supplierPrice": null, "image": "assets/tv.jpg"}, {"name": "50 इंच 4K स्मार्ट टीवी", "nameEn": "50-inch 4K Smart TV", "category": "इलेक्ट्रॉनिक्स", "tag": "नया", "price": 18500, "supplierPrice": null, "image": "assets/tv.jpg"}, {"name": "यूनिवर्सल टीवी रिमोट", "nameEn": "Universal TV Remote", "category": "इलेक्ट्रॉनिक्स", "tag": "नया", "price": 230, "supplierPrice": null, "image": "assets/tv-remote.jpg"}, {"name": "Mobile Display / Screen (universal)", "nameEn": "Mobile Display / Screen (universal)", "category": "Mobile Spare Parts", "tag": "लोकप्रिय", "price": null, "supplierPrice": null, "image": "assets/sparepart-display.jpg"}, {"name": "Mobile Battery", "nameEn": "Mobile Battery", "category": "Mobile Spare Parts", "tag": "बेस्टसेलर", "price": null, "supplierPrice": null, "image": "assets/sparepart-battery.jpg"}, {"name": "Back Cover / Back Panel", "nameEn": "Back Cover / Back Panel", "category": "Mobile Spare Parts", "tag": "नया", "price": null, "supplierPrice": null, "image": "assets/sparepart-display.jpg"}, {"name": "Charging Flex Cable / Charging Port", "nameEn": "Charging Flex Cable / Charging Port", "category": "Mobile Spare Parts", "tag": "लोकप्रिय", "price": null, "supplierPrice": null, "image": "assets/sparepart-battery.jpg"}, {"name": "Camera Glass / Lens", "nameEn": "Camera Glass / Lens", "category": "Mobile Spare Parts", "tag": "नया", "price": null, "supplierPrice": null, "image": "assets/sparepart-display.jpg"}, {"name": "SIM Tray", "nameEn": "SIM Tray", "category": "Mobile Spare Parts", "tag": "लोकप्रिय", "price": null, "supplierPrice": null, "image": "assets/sparepart-display.jpg"}, {"name": "Power Button Flex", "nameEn": "Power Button Flex", "category": "Mobile Spare Parts", "tag": "नया", "price": null, "supplierPrice": null, "image": "assets/sparepart-battery.jpg"}, {"name": "Earpiece Speaker", "nameEn": "Earpiece Speaker", "category": "Mobile Spare Parts", "tag": "बेस्टसेलर", "price": null, "supplierPrice": null, "image": "assets/sparepart-battery.jpg"}, {"name": "ड्राई फ्रूट गिफ्ट बॉक्स", "nameEn": "Dry Fruit Gift Box", "category": "फेस्टिव", "tag": "नया", "price": 80, "supplierPrice": null, "image": ""}];
+
+$("seedBtn").onclick = async () => {
+  if (products.length > 0) { toast("⚠️ Database me pehle se products hain!"); return; }
+  if (!(await confirmDlg("77 maujooda products database me import karne hain?"))) return;
+  $("seedBtn").disabled = true;
+  $("seedBtn").textContent = "Import ho raha hai...";
+  try {
+    const ts = firebase.firestore.FieldValue.serverTimestamp();
+    let n = 0;
+    for (const s of SEED_PRODUCTS) {
+      const sup = s.supplierPrice != null ? s.supplierPrice : (s.price != null ? Math.round(s.price / 1.1) : null);
+      await db.collection("products").add({
+        name: s.name, nameEn: s.nameEn || "", category: s.category, tag: s.tag || "",
+        supplierPrice: sup, price: s.price != null ? s.price : (sup != null ? sellPrice(sup) : null),
+        marginPct: 10, stock: "in_stock", image: s.image || "", description: "",
+        createdAt: ts, updatedAt: ts
+      });
+      n++;
+      $("seedBtn").textContent = n + " / " + SEED_PRODUCTS.length + "...";
+    }
+    const cats = [...new Set(SEED_PRODUCTS.map(s => s.category))];
+    for (const cn of cats) await db.collection("categories").add({ name: cn, createdAt: ts });
+    toast("✅ " + n + " products import ho gaye!");
+    loadCategories(); loadProducts();
+  } catch(e){ toast("❌ Error: " + e.message); }
+  $("seedBtn").disabled = false;
+  $("seedBtn").textContent = "77 Products Import Karo";
+};
+</script>
+
+<script src="product-images-data.js"></script>
+<script>
+document.getElementById("updateImagesBtn").onclick = async () => {
+  const status = document.getElementById("imgUpdateStatus");
+  if (typeof window.PRODUCT_IMAGES === "undefined") {
+    status.innerHTML = '<span style="color:red;">❌ Data load nahi hua. Page refresh karo.</span>';
+    return;
+  }
+  if (!(await confirmDlg("1539 products ki images update karni hain? Pakka?"))) return;
+  status.innerHTML = '⏳ Update ho raha hai...';
+  const images = window.PRODUCT_IMAGES;
+  const names = Object.keys(images);
+  let updated = 0, notFound = 0;
+  try {
+    const snap = await db.collection("products").get();
+    const prodMap = {};
+    snap.docs.forEach(d => { prodMap[(d.data().name||"").trim()] = d.ref; });
+    const batchSize = 100;
+    for (let i = 0; i < names.length; i += batchSize) {
+      const batch = db.batch();
+      let count = 0;
+      for (const name of names.slice(i, i + batchSize)) {
+        const ref = prodMap[name];
+        if (ref) {
+          batch.update(ref, { image: images[name], updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+          count++; updated++;
+        } else { notFound++; }
+      }
+      if (count > 0) await batch.commit();
+      status.innerHTML = `⏳ ${Math.min(i+batchSize, names.length)}/${names.length} ho gaya...`;
+    }
+    status.innerHTML = `<span style="color:green;">✅ Done! ${updated} updated, ${notFound} nahi mile.</span>`;
+    toast("✅ " + updated + " products ki images update ho gayin!");
+    await auditLog("Product images update", updated + " products");
+  } catch(e) {
+    status.innerHTML = '<span style="color:red;">❌ Error: ' + e.message + '</span>';
+  }
+};
+</script>
 </body>
+</html>
+
 </html>
