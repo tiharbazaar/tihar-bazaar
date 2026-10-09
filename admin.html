@@ -2371,7 +2371,7 @@ document.getElementById("updateImagesBtn").onclick = async () => {
       for (const name of names.slice(i, i + batchSize)) {
         const ref = prodMap[name];
         if (ref) {
-          batch.update(ref, { img: images[name], image: images[name], updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+          batch.update(ref, { img: images[name], image: images[name] });
           count++; updated++;
         } else { notFound++; }
       }
