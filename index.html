@@ -1010,17 +1010,7 @@ document.addEventListener('DOMContentLoaded',()=>{const mb=document.getElementBy
   const isMobileAuth = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent || '');
   async function socialFlow(mkProvider) {
     const provider = mkProvider();
-    try {
-      await signInWithPopup(auth, provider);
-    } catch (e) {
-      // Popup blocked/failed - fallback to redirect (mobile)
-      if (e && (e.code === 'auth/popup-blocked' || e.code === 'auth/popup-closed-by-user' || e.code === 'auth/cancelled-popup-request')) {
-        try { sessionStorage.setItem('tb_redir', '1'); } catch (se) {}
-        await signInWithRedirect(auth, provider);
-        return;
-      }
-      throw e;
-    }
+    await signInWithPopup(auth, provider);
   }
   window.tiharAuth = {
     ready: READY,
@@ -1046,7 +1036,11 @@ document.addEventListener('DOMContentLoaded',()=>{const mb=document.getElementBy
       if (window.tiharCloseAuth) window.tiharCloseAuth();
     } catch (e) {
       const code = e && e.code;
-      if (code !== 'auth/popup-closed-by-user') setStatus(e && e.message === 'not-configured' ? cc.pending : cc.fail);
+      if (code === 'auth/popup-blocked') {
+        setStatus('Popup blocked! Address bar me popup icon par click karke Allow karo.');
+      } else if (code !== 'auth/popup-closed-by-user') {
+        setStatus(e && e.message === 'not-configured' ? cc.pending : cc.fail);
+      }
     }
     [b1, b2].forEach(b => { if (b) b.disabled = false; });
   };
