@@ -137,7 +137,7 @@
           <h1 id="authHeroTitle">खरीदारी की नई कहानी</h1>
           <p id="authHeroText">अपनी अगली शानदार खरीद की शुरुआत यहाँ से करें—त्योहार से टेक्नोलॉजी तक।</p>
         </div>
-        <div class="auth-points" aria-label="सुविधाएँ"><span id="pointProducts">50+ Products</span><span id="pointVoice">Voice Search</span><span id="pointEnquiry">Worldwide Enquiry</span></div>
+        <div class="auth-points" aria-label="Features"><span id="pointProducts">50+ Products</span><span id="pointVoice">Voice Search</span><span id="pointEnquiry">Worldwide Enquiry</span></div>
       </div>
             <div class="auth-card dz">
         <div class="language-switch" id="authLanguages" aria-label="Language" style="display:none">
@@ -158,7 +158,7 @@
           </div>
           <div id="phonePane" role="tabpanel" hidden>
             <div class="dz-phone-row">
-              <span class="field-box dz-code"><select id="loginPhoneCode" aria-label="देश कोड"><option value="+977" selected>NP+977</option><option value="+91">IN+91</option></select></span>
+              <span class="field-box dz-code"><select id="loginPhoneCode" aria-label="Country code"><option value="+977" selected>NP+977</option><option value="+91">IN+91</option></select></span>
               <label class="field dz-phone-field"><span class="field-box"><input id="loginPhone" type="tel" inputmode="tel" autocomplete="tel" placeholder="अपना फ़ोन नंबर डालें"></span></label>
             </div>
             <button class="dz-login" id="sendSms" type="button">📱 <span id="sendSmsTxt">SMS से कोड भेजें</span></button>
@@ -179,7 +179,7 @@
         <div id="signupPane" hidden>
           <label class="field"><span class="field-box"><input id="signupName" type="text" autocomplete="name" placeholder="पूरा नाम"></span></label>
           <div class="dz-phone-row">
-            <span class="field-box dz-code"><select id="signupPhoneCode" aria-label="देश कोड"><option value="+977" selected>NP+977</option><option value="+91">IN+91</option></select></span>
+            <span class="field-box dz-code"><select id="signupPhoneCode" aria-label="Country code"><option value="+977" selected>NP+977</option><option value="+91">IN+91</option></select></span>
             <label class="field dz-phone-field"><span class="field-box"><input id="signupPhone" type="tel" inputmode="tel" autocomplete="tel" placeholder="मोबाइल नंबर"></span></label>
           </div>
           <label class="field"><span class="field-box"><input id="signupEmail" type="email" autocomplete="email" placeholder="ईमेल"></span></label>
@@ -202,7 +202,7 @@
       <div class="search">
         <svg width="21" height="21" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="m16.5 16.5 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         <input id="search" type="search" aria-label="Search products" placeholder="Search festive or electronic items…" autocomplete="off" />
-        <button class="voice" id="voiceSearch" type="button" aria-label="आवाज़ से खोजें" title="आवाज़ से खोजें"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" stroke="currentColor" stroke-width="2"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3M9 21h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+        <button class="voice" id="voiceSearch" type="button" aria-label="Voice search" title="Voice search"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" stroke="currentColor" stroke-width="2"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3M9 21h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
       </div>
       <select class="site-language" id="siteLanguage" aria-label="Language" style="display:none"><option value="en" selected>English</option></select>
       <button class="account-button" id="accountOpen" type="button" aria-label="Open login"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="8" r="3.5" stroke="currentColor" stroke-width="1.8"/><path d="M5 20a7 7 0 0 1 14 0" stroke="currentColor" stroke-width="1.8"/></svg><span id="accountLabel">लॉग इन</span></button>
@@ -214,44 +214,34 @@
     </div>
   </header>
   <div class="shop-layout"><div class="shop-main"><div class="filter-strip"><button class="cat-menu-btn" id="catMenuBtn" type="button">☰ Categories</button>
-    <nav class="categories" aria-label="श्रेणियाँ" id="categories"></nav>
-    <label class="price-filter" for="priceRange"><span id="priceFilterLabel">Price</span><select id="priceRange" aria-label="कीमत सीमा"></select></label>
+    <nav class="categories" aria-label="Categories" id="categories"></nav>
+    <label class="price-filter" for="priceRange"><span id="priceFilterLabel">Price</span><select id="priceRange" aria-label="Price range"></select></label>
   </div>
-  <section class="delivery-check" aria-label="स्थान के अनुसार डिलीवरी जाँचें">
-    <label for="deliveryLocation"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 21s7-6.3 7-12a7 7 0 1 0-14 0c0 5.7 7 12 7 12Z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="9" r="2.3" stroke="currentColor" stroke-width="1.8"/></svg>डिलीवरी स्थान</label>
-    <div class="location-entry"><input id="deliveryLocation" type="text" inputmode="text" maxlength="40" placeholder="Pincode या शहर" autocomplete="postal-code" /><button id="checkDelivery" type="button">जाँचें</button></div>
-    <div class="location-status" id="locationStatus" role="status">स्थान डालकर डिलीवरी और शिपिंग की जानकारी देखें।</div>
+  <section class="delivery-check" aria-label="Check delivery by location">
+    <label for="deliveryLocation"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 21s7-6.3 7-12a7 7 0 1 0-14 0c0 5.7 7 12 7 12Z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="9" r="2.3" stroke="currentColor" stroke-width="1.8"/></svg>Delivery location</label>
+    <div class="location-entry"><input id="deliveryLocation" type="text" inputmode="text" maxlength="40" placeholder="Pincode or city" autocomplete="postal-code" /><button id="checkDelivery" type="button">Check</button></div>
+    <div class="location-status" id="locationStatus" role="status">Enter a location to see delivery and shipping info.</div>
   </section>
   <main class="shell">
-    <section class="banner-carousel" aria-label="मुख्य ऑफर" id="bannerCarousel">
+    <section class="banner-carousel" aria-label="Featured offers" id="bannerCarousel">
       <article class="promo-slide festival active" data-slide="0">
-        <div class="hero-copy"><h1>Everything for Every Festival</h1><p>Decor, traditional wear and pooja essentials in one place.</p><a href="#products" data-filter="सभी">अभी देखें</a></div>
+        <div class="hero-copy"><h1>Everything for Every Festival</h1><p>Decor, traditional wear and pooja essentials in one place.</p><a href="#products" data-filter="सभी">Shop now</a></div>
         <div class="hero-art" aria-hidden="true"><span class="spark s1">✦</span><span class="spark s2">✦</span><span class="spark s3">✦</span><div class="lamp"></div></div>
       </article>
       <article class="promo-slide tech" data-slide="1" aria-hidden="true">
-        <div class="hero-copy"><h1>From Mobiles to Laptops</h1><p>Everyday electronics and essential accessories together.</p><a href="#products" data-filter="इलेक्ट्रॉनिक्स">इलेक्ट्रॉनिक्स देखें</a></div>
+        <div class="hero-copy"><h1>From Mobiles to Laptops</h1><p>Everyday electronics and essential accessories together.</p><a href="#products" data-filter="इलेक्ट्रॉनिक्स">View electronics</a></div>
         <div class="hero-art" aria-hidden="true"><div class="hero-gadget"></div></div>
       </article>
       <article class="promo-slide value" data-slide="2" aria-hidden="true">
-        <div class="hero-copy"><h1>Straightforward Pricing</h1><p>Only 10% margin on listed NPR prices. Shipping separate.</p><a href="#products" data-filter="सभी">उत्पाद देखें</a></div>
+        <div class="hero-copy"><h1>Straightforward Pricing</h1><p>Only 10% margin on listed NPR prices. Shipping separate.</p><a href="#products" data-filter="सभी">View products</a></div>
         <div class="hero-art" aria-hidden="true"><div class="value-mark">+10%</div></div>
       </article>
-      <button class="carousel-control prev" id="bannerPrev" type="button" aria-label="पिछला ऑफर">‹</button>
-      <button class="carousel-control next" id="bannerNext" type="button" aria-label="अगला ऑफर">›</button>
-      <div class="carousel-dots" id="carouselDots" aria-label="ऑफर चुनें">
-        <button class="carousel-dot active" type="button" data-slide-to="0" aria-label="ऑफर 1" aria-current="true"></button>
-        <button class="carousel-dot" type="button" data-slide-to="1" aria-label="ऑफर 2"></button>
-        <button class="carousel-dot" type="button" data-slide-to="2" aria-label="ऑफर 3"></button>
-      </div>
-    </section>
-
-    <section class="deals" aria-label="आज के ऑफर">
-      <div class="deals-head"><h2>Today's Special Offers</h2><span>Listed NPR prices • Only 10% margin</span></div>
-      <div class="deal-grid">
-        <button class="deal-card" type="button" data-deal="इलेक्ट्रॉनिक्स"><strong>इलेक्ट्रॉनिक्स</strong><span>मोबाइल, लैपटॉप और एक्सेसरीज़</span><em>देखें →</em></button>
-        <button class="deal-card" type="button" data-deal="पहनावा"><strong>फेस्टिव फैशन</strong><span>साड़ी, कुर्ता और एथनिक सेट</span><em>देखें →</em></button>
-        <button class="deal-card" type="button" data-deal="सजावट"><strong>घर की सजावट</strong><span>तोरण, रंगोली और हैंगिंग</span><em>देखें →</em></button>
-        <button class="deal-card" type="button" data-deal="लाइटिंग"><strong>फेस्टिव लाइटिंग</strong><span>परदा और कॉपर लाइट</span><em>देखें →</em></button>
+      <button class="carousel-control prev" id="bannerPrev" type="button" aria-label="Previous offer">‹</button>
+      <button class="carousel-control next" id="bannerNext" type="button" aria-label="Next offer">›</button>
+      <div class="carousel-dots" id="carouselDots" aria-label="Choose offer">
+        <button class="carousel-dot active" type="button" data-slide-to="0" aria-label="Offer 1" aria-current="true"></button>
+        <button class="carousel-dot" type="button" data-slide-to="1" aria-label="Offer 2"></button>
+        <button class="carousel-dot" type="button" data-slide-to="2" aria-label="Offer 3"></button>
       </div>
     </section>
 
@@ -286,7 +276,7 @@
       <div class="benefit"><svg width="31" height="31" viewBox="0 0 24 24" fill="none"><path d="M4 5h16v12H8l-4 3z" stroke="currentColor" stroke-width="1.8"/><path d="M8 9h8M8 13h5" stroke="currentColor" stroke-width="1.8"/></svg><div><b>मूल्य पूछें</b><span>अपनी सूची डाउनलोड करके विक्रेता से साझा करें</span></div></div>
     </section>
 
-    <section class="contact-band" id="contact" aria-label="ऑर्डर संपर्क">
+    <section class="contact-band" id="contact" aria-label="Order contact">
       <div><b>Contact us for orders or info</b><span>Confirm product price and availability by phone or email.</span></div>
       <div class="contact-actions">
         <a href="tel:+9779719631185" aria-label="प्लस नौ सात सात नौ सात एक नौ छह तीन एक एक आठ पांच पर कॉल करें"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 3H4.5A1.5 1.5 0 0 0 3 4.5C3 13.6 10.4 21 19.5 21a1.5 1.5 0 0 0 1.5-1.5V17l-4.5-1.2-1.1 2.1a14.5 14.5 0 0 1-9.3-9.3l2.1-1.1L7 3Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>+977 9719631185</a>
@@ -344,11 +334,11 @@
       </div>
     </section>
   </main>
-  <footer><a class="footer-link" href="#suppliers">Suppliers</a> · <a class="footer-link" href="about.html">About Us</a> · <a class="footer-link" href="contact.html">Contact</a> · <a class="footer-link" href="terms.html">Terms</a> · <a class="footer-link" href="shipping.html">Shipping</a> · <a class="footer-link" href="returns.html">Returns</a> · <a class="footer-link" href="privacy.html">Privacy Policy</a><div>उत्पाद की कीमत और उपलब्धता ऑर्डर के समय बताई जाएगी। शिपिंग शुल्क अलग होगा और ग्राहक द्वारा देय है।</div></footer>
+  <footer><a class="footer-link" href="#suppliers">Suppliers</a> · <a class="footer-link" href="about.html">About Us</a> · <a class="footer-link" href="contact.html">Contact</a> · <a class="footer-link" href="terms.html">Terms</a> · <a class="footer-link" href="shipping.html">Shipping</a> · <a class="footer-link" href="returns.html">Returns</a> · <a class="footer-link" href="privacy.html">Privacy Policy</a><div>Product prices and availability are confirmed at order time. Shipping charges are separate and payable by the customer.</div></footer>
 
   <section class="detail-dialog" id="detailDialog" aria-hidden="true">
     <article class="detail-panel" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
-      <div class="detail-top"><button class="detail-close" id="detailClose" type="button" aria-label="वापस जाएँ">← <span id="detailBackLabel">वापस</span></button><strong id="detailPageLabel">उत्पाद विवरण</strong></div>
+      <div class="detail-top"><button class="detail-close" id="detailClose" type="button" aria-label="Go back">← <span id="detailBackLabel">वापस</span></button><strong id="detailPageLabel">उत्पाद विवरण</strong></div>
       <div class="detail-body" id="detailBody"></div>
     </article>
   </section>
@@ -358,7 +348,7 @@
     <section class="panel" role="dialog" aria-modal="true" aria-labelledby="cartTitle">
       <div class="panel-head"><h2 id="cartTitle">My Cart</h2><button class="close" id="close" type="button" aria-label="बंद करें">×</button></div>
       <div class="cart-list" id="cartList"></div>
-      <div class="panel-foot"><div class="cost-breakdown" id="costBreakdown" aria-label="पूरा खर्च"></div><div class="cart-order-actions"><button class="whatsapp-order" id="placeOrderBtn" type="button" aria-disabled="true" style="border:0;cursor:pointer;font-family:inherit;font-size:inherit"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 11.6a8 8 0 0 1-11.8 7L4 20l1.4-4A8 8 0 1 1 20 11.6Z" stroke="currentColor" stroke-width="1.8"/><path d="M9 8.2c.4 2.4 2.1 4.2 4.6 4.9l1.1-1.1 1.9.9c.3.1.5.5.3.8-.5 1.2-1.7 1.8-3 1.5-3.6-.8-6.1-3.4-6.9-6.8-.3-1.3.4-2.5 1.6-3 .3-.1.7 0 .8.4l.8 1.8L9 8.2Z" fill="currentColor"/></svg><span id="whatsappOrderText">WhatsApp पर ऑर्डर करें</span></button><button class="download" id="download" type="button">कार्ट सूची डाउनलोड करें</button></div></div>
+      <div class="panel-foot"><div class="cost-breakdown" id="costBreakdown" aria-label="Cost breakdown"></div><div class="cart-order-actions"><button class="whatsapp-order" id="placeOrderBtn" type="button" aria-disabled="true" style="border:0;cursor:pointer;font-family:inherit;font-size:inherit"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 11.6a8 8 0 0 1-11.8 7L4 20l1.4-4A8 8 0 1 1 20 11.6Z" stroke="currentColor" stroke-width="1.8"/><path d="M9 8.2c.4 2.4 2.1 4.2 4.6 4.9l1.1-1.1 1.9.9c.3.1.5.5.3.8-.5 1.2-1.7 1.8-3 1.5-3.6-.8-6.1-3.4-6.9-6.8-.3-1.3.4-2.5 1.6-3 .3-.1.7 0 .8.4l.8 1.8L9 8.2Z" fill="currentColor"/></svg><span id="whatsappOrderText">WhatsApp पर ऑर्डर करें</span></button><button class="download" id="download" type="button">कार्ट सूची डाउनलोड करें</button></div></div>
     </section>
   </aside>
   <section class="order-modal" id="orderModal" aria-hidden="true">
@@ -757,7 +747,7 @@ document.addEventListener('DOMContentLoaded',()=>{const mb=document.getElementBy
     document.getElementById('tabMyOrders').onclick=()=>switchOrdersTab('my');document.getElementById('shade').onclick=()=>openDrawer(false);document.onkeydown=e=>{if(e.key==='Escape'){openDrawer(false);closeDetail();showAuth(false)}};
     const voiceButton=document.getElementById('voiceSearch'), Recognition=window.SpeechRecognition||window.webkitSpeechRecognition;let recognition;
     voiceButton.onclick=()=>{if(!Recognition){toast('इस ब्राउज़र में आवाज़ से खोज उपलब्ध नहीं है');return}if(!recognition){recognition=new Recognition();recognition.lang='hi-IN';recognition.interimResults=false;recognition.maxAlternatives=1;recognition.onstart=()=>{voiceButton.classList.add('listening');voiceButton.setAttribute('aria-label','आवाज़ सुन रहा है')};recognition.onend=()=>{voiceButton.classList.remove('listening');voiceButton.setAttribute('aria-label','आवाज़ से खोजें')};recognition.onerror=()=>toast('आवाज़ समझ नहीं आई, फिर कोशिश करें');recognition.onresult=e=>{const spoken=e.results[0][0].transcript;document.getElementById('search').value=spoken;query=spoken;render();toast('आवाज़ से खोजा: '+spoken)}}recognition.start()};
-    function checkDelivery(){const input=document.getElementById('deliveryLocation'),place=input.value.trim(),status=document.getElementById('locationStatus');if(place.length<3){status.textContent='सही पिनकोड या शहर डालें।';input.focus();return}status.textContent=place+' के लिए डिलीवरी उपलब्धता और शिपिंग शुल्क की ऑर्डर के समय पुष्टि होगी।'}
+    function checkDelivery(){const input=document.getElementById('deliveryLocation'),place=input.value.trim(),status=document.getElementById('locationStatus');if(place.length<3){status.textContent='Please enter a valid pincode or city.';input.focus();return}status.textContent=place+' — delivery availability and shipping charges will be confirmed at order time.'}
     document.getElementById('checkDelivery').onclick=checkDelivery;document.getElementById('deliveryLocation').onkeydown=e=>{if(e.key==='Enter')checkDelivery()};
     document.getElementById('copyEnquiry').onclick=async()=>{const text=document.getElementById('enquiryMessage').value;let copied=false;try{await navigator.clipboard.writeText(text);copied=true}catch(e){const field=document.getElementById('enquiryMessage');field.focus();field.select();copied=document.execCommand('copy')}if(copied){toast('Enquiry message copy ho gaya');const button=document.getElementById('copyEnquiry');button.textContent='Copied';setTimeout(()=>button.textContent='Copy',1800)}else toast('Copy nahi hua — message select karke copy karein')};
     document.getElementById('download').onclick=()=>{if(!cart.length){toast(trustCopy[currentLang].empty);return}const t=trustCopy[currentLang],costs=cartCosts(cart),qtyLabel={hi:'मात्रा',ne:'मात्रा',en:'Quantity'}[currentLang],lines=['TIHAR BAZAAR — '+t.cartTitle,'+977 9719631185','',...cart.map((item,i)=>{const p=products.find(product=>product.id===item.id);return localDigits(i+1)+'. '+productName(p)+' — '+qtyLabel+': '+localDigits(item.qty)+' — '+t.itemPrice+': '+(p.price?money(p.price)+(item.qty>1?' × '+localDigits(item.qty)+' = '+money(p.price*item.qty):''):uiCopy[currentLang].askPrice)}),'',t.subtotal+': '+subtotalText(costs),t.delivery+': '+t.deliveryPending,t.total+': '+totalText(costs),'',t.costNote];const blob=new Blob([lines.join('\n')],{type:'text/plain;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='tihar-bazaar-cart.txt';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast(currentLang==='en'?'Cart list downloaded':currentLang==='ne'?'कार्ट सूची डाउनलोड भयो':'कार्ट सूची डाउनलोड हो गई')};
