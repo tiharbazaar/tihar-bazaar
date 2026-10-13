@@ -18,13 +18,25 @@
 <meta property="og:description" content="Festival shopping online in Nepal. Best prices, only 10% margin. Delivery across Nepal." />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://tiharbazaar.github.io/tihar-bazaar/" />
+<link rel="canonical" href="https://tiharbazaar.github.io/tihar-bazaar/" />
+<meta property="og:image" content="https://tiharbazaar.github.io/tihar-bazaar/assets/tihar-bazaar-logo.jpg" />
+<meta property="og:image:alt" content="Tihar Bazaar logo" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Tihar Bazaar - Online Shopping in Nepal | Festival Shopping" />
+<meta name="twitter:description" content="Festival shopping online in Nepal. Best prices, only 10% margin. Delivery across Nepal." />
+<meta name="twitter:image" content="https://tiharbazaar.github.io/tihar-bazaar/assets/tihar-bazaar-logo.jpg" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Organization","name":"Tihar Bazaar","url":"https://tiharbazaar.github.io/tihar-bazaar/","logo":"https://tiharbazaar.github.io/tihar-bazaar/assets/tihar-bazaar-logo.jpg","contactPoint":{"@type":"ContactPoint","telephone":"+977-9719631185","contactType":"customer service"},"address":{"@type":"PostalAddress","addressLocality":"Janakpurdham","addressCountry":"NP"}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebSite","name":"Tihar Bazaar","url":"https://tiharbazaar.github.io/tihar-bazaar/","description":"Nepal's festival shopping website. Buy clothes, electronics, home items, Diwali lights & decorations online."}
+</script>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="color-scheme" content="light dark" />
   <link rel="icon" href="assets/tihar-bazaar-logo.jpg" type="image/jpeg" />
   <meta name="application-name" content="Tihar Bazaar" />
   <meta name="apple-mobile-web-app-title" content="Tihar Bazaar" />
   <meta property="og:site_name" content="Tihar Bazaar" />
-  <title>Tihar Bazaar</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700;800&family=Roboto:wght@400;500;700&display=swap');
     :root {
@@ -306,7 +318,7 @@
       <div><b>Contact us for orders or info</b><span>Confirm product price and availability by phone or email.</span></div>
       <div class="contact-actions">
         <a href="tel:+9779719631185" aria-label="प्लस नौ सात सात नौ सात एक नौ छह तीन एक एक आठ पांच पर कॉल करें"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 3H4.5A1.5 1.5 0 0 0 3 4.5C3 13.6 10.4 21 19.5 21a1.5 1.5 0 0 0 1.5-1.5V17l-4.5-1.2-1.1 2.1a14.5 14.5 0 0 1-9.3-9.3l2.1-1.1L7 3Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>+977 9719631185</a>
-        <a class="email-link" href="mailto:tiharbazaar@gmail.com" aria-label="tiharbazaar@gmail.com पर ईमेल करें"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="m4 7 8 6 8-6" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>tiharbazaar@gmail.com</a>
+        <a class="email-link" href="mailto:govindbhagt126@gmail.com" aria-label="govindbhagt126@gmail.com पर ईमेल करें"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="m4 7 8 6 8-6" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>govindbhagt126@gmail.com</a>
       </div>
     </section>
 
@@ -1018,6 +1030,13 @@ document.addEventListener('DOMContentLoaded',()=>{const mb=document.getElementBy
   const isMobileAuth = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent || '');
   async function socialFlow(mkProvider) {
     const provider = mkProvider();
+    if (isMobileAuth) {
+      // Mobile browsers (Chrome on Android/iOS) often leave signInWithPopup
+      // stuck on about:blank, so use the redirect flow on mobile instead.
+      try { sessionStorage.setItem('tb_redir', '1'); } catch (e) {}
+      await signInWithRedirect(auth, provider);
+      return;
+    }
     await signInWithPopup(auth, provider);
   }
   window.tiharAuth = {
