@@ -100,6 +100,22 @@
     .app-bottom-nav button span{font-size:22px;line-height:1}
     .app-bottom-nav button.active{color:var(--orange)}
     @media(max-width:760px){.app-bottom-nav{display:flex}body{padding-bottom:64px}}
+    .mega-footer{background:#1a1a2e;color:#d0d0d0;margin-top:20px}
+    .mf-cols{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;padding:34px 22px;max-width:1200px;margin:auto}
+    .mf-col h4{margin:0 0 12px;font-size:12px;color:#8a8a8a;letter-spacing:1px}
+    .mf-col a{display:block;color:#d0d0d0;text-decoration:none;font-size:14px;padding:4px 0}
+    .mf-col a:hover{color:#fff;text-decoration:underline}
+    .mf-contact p{font-size:14px;line-height:1.7;margin:0}
+    .mf-social{display:flex;gap:12px;margin-top:10px;font-size:22px}
+    .mf-social a{padding:0}
+    .mf-bottom{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;border-top:1px solid #333;padding:14px 22px;max-width:1200px;margin:auto;font-size:13px}
+    .mf-note{text-align:center;font-size:11px;color:#8a8a8a;padding:0 22px 16px;max-width:1200px;margin:auto}
+    @media(max-width:760px){.mf-cols{grid-template-columns:repeat(2,1fr);padding:24px 14px}.mf-bottom{justify-content:center;text-align:center}}
+    .cat-icon-bar{display:flex;gap:6px;overflow-x:auto;background:var(--surface);border-bottom:1px solid var(--line);padding:12px 14px;scrollbar-width:thin}
+    .cat-icon-bar::-webkit-scrollbar{height:6px}.cat-icon-bar::-webkit-scrollbar-thumb{background:var(--line);border-radius:3px}
+    .cat-icon{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:6px;border:0;background:none;cursor:pointer;padding:6px 10px;min-width:76px;color:var(--ink);font-weight:700;font-size:12px}
+    .cat-icon .ci{font-size:34px;line-height:1;filter:drop-shadow(0 2px 3px rgba(0,0,0,.15))}
+    .cat-icon.active{color:var(--orange)}.cat-icon.active .ci{transform:scale(1.15)}
     .cat-section{margin:0 0 8px}.cat-section-head{display:flex;align-items:center;justify-content:space-between;padding:18px 18px 10px}.cat-section-head h2{margin:0;font-size:22px}.cat-see-all{border:1px solid var(--line);background:var(--surface);color:var(--blue);border-radius:20px;padding:6px 14px;font-weight:800;font-size:13px;cursor:pointer}.cat-section-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;padding:0 18px}
     @media(max-width:760px){.cat-section-grid{grid-template-columns:repeat(2,1fr);gap:10px;padding:0 10px}.cat-section-head{padding:14px 10px 8px}.cat-section-head h2{font-size:18px}}
     @media(max-width:760px){.detail-top{padding:10px}.detail-top strong{font-size:15px}.detail-body{grid-template-columns:1fr}.detail-gallery{position:static;grid-template-columns:58px minmax(0,1fr);min-height:0;padding:14px}.detail-thumb{height:58px}.detail-visual{min-height:285px;padding:18px}.detail-visual img{max-height:300px}.detail-visual .product-art{height:265px}.detail-copy{padding:24px 17px 40px}.detail-copy h2{font-size:24px}.detail-purchase{align-items:stretch;flex-direction:column}.detail-actions{max-width:none}.detail-delivery{grid-template-columns:1fr}.detail-delivery button{padding:10px}.detail-gallery .product-art svg{width:58%;height:58%}}
@@ -258,6 +274,7 @@
       </button>
     </div>
   </header>
+  <nav class="cat-icon-bar" id="catIconBar" aria-label="Shop by category"></nav>
   <div class="shop-layout"><div class="shop-main"><div class="filter-strip"><button class="cat-menu-btn" id="catMenuBtn" type="button">☰ Categories</button>
     <nav class="categories" aria-label="Categories" id="categories"></nav>
     <label class="price-filter" for="priceRange"><span id="priceFilterLabel">Price</span><select id="priceRange" aria-label="Price range"></select></label>
@@ -379,7 +396,16 @@
       </div>
     </section>
   </main>
-  <footer><a class="footer-link" href="#suppliers">Suppliers</a> · <a class="footer-link" href="about.html">About Us</a> · <a class="footer-link" href="contact.html">Contact</a> · <a class="footer-link" href="terms.html">Terms</a> · <a class="footer-link" href="shipping.html">Shipping</a> · <a class="footer-link" href="returns.html">Returns</a> · <a class="footer-link" href="privacy.html">Privacy Policy</a><div>Product prices and availability are confirmed at order time. Shipping charges are separate and payable by the customer.</div></footer>
+  <footer class="mega-footer">
+    <div class="mf-cols">
+      <div class="mf-col"><h4>ABOUT</h4><a href="contact.html">Contact Us</a><a href="about.html">About Us</a><a href="#suppliers">Suppliers</a><a href="#suppliers">Become a Supplier</a></div>
+      <div class="mf-col"><h4>HELP</h4><a href="shipping.html">Shipping</a><a href="shipping.html">Payments</a><a href="returns.html">Cancellation &amp; Returns</a><a href="contact.html">FAQ</a></div>
+      <div class="mf-col"><h4>POLICY</h4><a href="returns.html">Return Policy</a><a href="terms.html">Terms Of Use</a><a href="privacy.html">Privacy</a><a href="sitemap.xml">Sitemap</a></div>
+      <div class="mf-col mf-contact"><h4>CONTACT US</h4><p>Tihar Bazaar,<br>Janakpurdham, Nepal<br>Phone: +977 9820681800<br>Email: tiharbazaar@gmail.com</p><div class="mf-social"><a href="#" aria-label="Facebook">📘</a><a href="#" aria-label="Instagram">📸</a><a href="#" aria-label="YouTube">▶️</a><a href="https://wa.me/9779820681800" aria-label="WhatsApp">💬</a></div></div>
+    </div>
+    <div class="mf-bottom"><span>© 2026 Tihar Bazaar</span><span class="mf-pay">💵 COD &nbsp; 📱 eSewa &nbsp; 📱 Khalti &nbsp; 🏦 Bank Transfer &nbsp; 💳 Visa</span></div>
+    <div class="mf-note">Product prices and availability are confirmed at order time. Shipping charges are separate and payable by the customer.</div>
+  </footer>
 
   <section class="detail-dialog" id="detailDialog" aria-hidden="true">
     <article class="detail-panel" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
@@ -485,6 +511,7 @@
         buildCats(data.categories);
         storeLoading=false;
         try{ renderCategories(); }catch(e){}
+        try{ renderCatIconBar(); }catch(e){}
         try{ render(); }catch(e){}
         try{ updateCart(); }catch(e){}
         // Background: load remaining products without blocking UI
@@ -740,7 +767,10 @@ document.getElementById('sendSms').onclick=()=>{const c=uiCopy[currentLang];cons
 document.getElementById('verifySms').onclick=()=>{const c=uiCopy[currentLang];const code=document.getElementById('smsCode').value.trim();if(code.length<6){authStatus('loginStatus',c.smsCodePh);return;}const A6=needTA('loginStatus');if(!A6)return;A6.verifySms(code).then(()=>{if(window.tiharCloseAuth)window.tiharCloseAuth();}).catch(()=>authStatus('loginStatus',c.codeWrong));};document.getElementById('accountOpen').onclick=()=>showAuth(true);document.getElementById('authClose').onclick=()=>showAuth(false);window.tiharCloseAuth=()=>showAuth(false);window.tiharLang=()=>currentLang;let _gRetried=false;const googlePendingMsg=()=>{const c=uiCopy[currentLang];['loginStatus','signupStatus'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=c.authSetupPending});if(!_gRetried){_gRetried=true;setTimeout(()=>{if(window.tiharGoogleLogin)window.tiharGoogleLogin(true);},2500);}};document.getElementById('loginGoogle').onclick=()=>{window.tiharGoogleLogin?window.tiharGoogleLogin():googlePendingMsg()};document.getElementById('signupGoogle').onclick=()=>{window.tiharGoogleLogin?window.tiharGoogleLogin():googlePendingMsg()};document.querySelectorAll('.show-pass').forEach(b=>b.onclick=()=>{const input=b.parentElement.querySelector('.password-input'),visible=input.type==='text';input.type=visible?'password':'text';const c=uiCopy[currentLang];b.textContent=visible?c.show:c.hide;b.setAttribute('aria-label',visible?c.show:c.hide)});
     [loginPane,signupPane].forEach(form=>form.addEventListener('submit',e=>e.preventDefault()));
     const grid=document.getElementById('grid'), catEl=document.getElementById('categories'), priceEl=document.getElementById('priceRange');
-    function renderCategories(){catEl.innerHTML='';const drawerNav=document.getElementById('catDrawerNav');if(drawerNav)drawerNav.innerHTML='';cats.forEach(([key,labelKey])=>{const label=labelKey?uiCopy[currentLang][labelKey]:key;if(drawerNav){const s=document.createElement('button');s.className=key===selectedCat?'active':'';s.textContent=label;s.onclick=()=>{selectedCat=key;renderCategories();render();closeCatDrawer()};drawerNav.appendChild(s)}})}
+    var CAT_ICONS=[['fashion','👕'],['cloth','👕'],['mobil','📱'],['phone','📱'],['electron','💻'],['beauty','💄'],['cosmet','💄'],['home','🏠'],['applian','🔌'],['toy','🧸'],['kid','🧸'],['food','🍎'],['groc','🛒'],['sport','⚽'],['furnit','🛋️'],['book','📚'],['lamp','💡'],['light','💡'],['pooja','🪔'],['decor','🎨'],['festiv','🎉'],['diwali','🪔'],['tihar','🪔']];
+    function catIconFor(name){var n=(name||'').toLowerCase();for(var i=0;i<CAT_ICONS.length;i++){if(n.indexOf(CAT_ICONS[i][0])!==-1)return CAT_ICONS[i][1];}return '📦';}
+    function renderCatIconBar(){var bar=document.getElementById('catIconBar');if(!bar)return;var all=[['__all__','⭐','For You']];var items=all.concat(cats.map(function(c){var nm=c[0];return [nm,catIconFor(nm),c[1]?nm:nm];}));bar.innerHTML=items.map(function(it){var key=it[0],icon=it[1],label=key==='__all__'?'For You':it[0];var active=(key==='__all__'?(selectedCat==='सभी'||selectedCat==='All'):selectedCat===key);return '<button type="button" class="cat-icon'+(active?' active':'')+'" data-catkey="'+key+'"><span class="ci">'+icon+'</span><span>'+label+'</span></button>';}).join('');bar.querySelectorAll('.cat-icon').forEach(function(b){b.onclick=function(){var k=b.dataset.catkey;selectedCat=(k==='__all__'?'सभी':k);renderCategories();renderCatIconBar();render();window.scrollTo({top:0,behavior:'smooth'});};});}
+    function renderCategories(){try{if(typeof renderCatIconBar==='function')renderCatIconBar();}catch(e){}catEl.innerHTML='';const drawerNav=document.getElementById('catDrawerNav');if(drawerNav)drawerNav.innerHTML='';cats.forEach(([key,labelKey])=>{const label=labelKey?uiCopy[currentLang][labelKey]:key;if(drawerNav){const s=document.createElement('button');s.className=key===selectedCat?'active':'';s.textContent=label;s.onclick=()=>{selectedCat=key;renderCategories();render();closeCatDrawer()};drawerNav.appendChild(s)}})}
 function openCatDrawer(){document.getElementById('catDrawer').classList.add('open');document.getElementById('catOverlay').classList.add('open')}
 function closeCatDrawer(){document.getElementById('catDrawer').classList.remove('open');document.getElementById('catOverlay').classList.remove('open')}
 document.addEventListener('DOMContentLoaded',()=>{const mb=document.getElementById('catMenuBtn');if(mb)mb.onclick=openCatDrawer;const cb=document.getElementById('catDrawerClose');if(cb)cb.onclick=closeCatDrawer;const ov=document.getElementById('catOverlay');if(ov)ov.onclick=closeCatDrawer});
