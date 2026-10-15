@@ -669,12 +669,22 @@ function renderOrders(){
       <td><b>₹${o.subtotal!=null?o.subtotal:"?"}</b></td>
       <td>${payCellHtml(o)}</td>
       <td><select class="status-select" data-oid="${o._id}">${opts}</select></td>
-      <td style="white-space:nowrap"><button class="btn btn-sec" data-view-ord="${o._id}" type="button">👁️</button> <button class="btn btn-sec" data-del-ord="${o._id}" type="button" style="color:var(--red)">🗑️</button></td>
+      <td style="white-space:nowrap"><button class="btn btn-sec" data-view-ord="${o._id}" type="button">👁️</button> <button class="btn btn-sec" data-fwd-ord="${o._id}" type="button" title="Supplier ko bhejo">📤</button> <button class="btn btn-sec" data-del-ord="${o._id}" type="button" style="color:var(--red)">🗑️</button></td>
     </tr>`;
   }).join("");
   tb.querySelectorAll(".status-select").forEach(s => s.onchange = () => updateOrderStatus(s.dataset.oid, s.value));
   tb.querySelectorAll("[data-view-ord]").forEach(b => b.onclick = () => showOrderDetail(b.dataset.viewOrd));
+  tb.querySelectorAll("[data-fwd-ord]").forEach(b => b.onclick = () => forwardToSupplier(b.dataset.fwdOrd));
   tb.querySelectorAll("[data-del-ord]").forEach(b => b.onclick = () => deleteOrder(b.dataset.delOrd));
+}
+
+function forwardToSupplier(docId){
+  const o = orders.find(x => x._id === docId);
+  if(!o) return;
+  const items = (o.items || []).map((it,i) => `${i+1}. ${it.name||"#"+it.id} x ${it.qty||1}`).join("\n");
+  const msg = `New Dropshipping Order ${o.orderId||docId}\n\nItems:\n${items}\n\nShip to:\n${o.customerName||""}\n${o.customerPhone||""}\n${o.customerAddress||""}\n\nPlease confirm and ship. Tracking number needed.`;
+  window.open("https://wa.me/?text=" + encodeURIComponent(msg), "_blank");
+  toast("📤 Supplier ko forward karo — WhatsApp khul gaya");
 }
 
 async function updateOrderStatus(docId, status){
