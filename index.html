@@ -465,15 +465,6 @@
         try{ renderCatIconBar(); }catch(e){}
         try{ render(); }catch(e){}
         try{ updateCart(); }catch(e){}
-        // Background: load remaining products without blocking UI
-        if(data.loadRest && data.hasMore){
-          data.loadRest().then(rest=>{
-            if(rest && rest.length > products.length){
-              products=rest.map(normalizeProduct).filter(pr=>pr.stock!=='out_of_stock');
-              try{ render(); }catch(e){}
-            }
-          });
-        }
       }catch(e){ storeError=true; storeLoading=false; }
     loadPaymentSettings();
       try{ renderCategories(); }catch(e){}
@@ -966,7 +957,7 @@ document.addEventListener('DOMContentLoaded',()=>{const mb=document.getElementBy
   // Jab tak config placeholder hai, buttons imaandaari se "setup pending" batayenge.
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
   import { getAuth, GoogleAuthProvider, FacebookAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, sendPasswordResetEmail, RecaptchaVerifier, signInWithPhoneNumber, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-  import { getFirestore, collection, getDocs, addDoc, query, where, limit, startAfter, serverTimestamp, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+  import { getFirestore, collection, getDocs, addDoc, query, where, limit, serverTimestamp, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
   const firebaseConfig = {
     apiKey: "AIzaSyCZjMeOhvKqh1xPmtJSdW9fH7ucWu4Wxfk",
     authDomain: "tihar-bazaar.firebaseapp.com",
@@ -1005,31 +996,12 @@ document.addEventListener('DOMContentLoaded',()=>{const mb=document.getElementBy
         fsDb = getFirestore();
         window.tiharFetchStore = async function(){
           const [pSnap, cSnap] = await Promise.all([
-            getDocs(query(collection(fsDb, 'products'), limit(60))),
+            getDocs(collection(fsDb, 'products')),
             getDocs(collection(fsDb, 'categories'))
           ]);
-          const firstBatch = pSnap.docs.map(d => Object.assign({ _fid: d.id }, d.data()));
-          const lastDoc = pSnap.docs[pSnap.docs.length - 1];
-          // Background: fetch remaining products without blocking
-          const loadRest = async function(){
-            try {
-              let allDocs = pSnap.docs.slice();
-              let cursor = lastDoc;
-              while (true) {
-                const nextSnap = await getDocs(query(collection(fsDb, 'products'), startAfter(cursor), limit(500)));
-                if (nextSnap.docs.length === 0) break;
-                allDocs = allDocs.concat(nextSnap.docs);
-                cursor = nextSnap.docs[nextSnap.docs.length - 1];
-                if (nextSnap.docs.length < 500) break;
-              }
-              return allDocs.map(d => Object.assign({ _fid: d.id }, d.data()));
-            } catch(e) { return null; }
-          };
           return {
-            products: firstBatch,
-            categories: cSnap.docs.map(d => d.data().name).filter(Boolean).sort(),
-            loadRest: loadRest,
-            hasMore: pSnap.docs.length === 60
+            products: pSnap.docs.map(d => Object.assign({ _fid: d.id }, d.data())),
+            categories: cSnap.docs.map(d => d.data().name).filter(Boolean).sort()
           };
         };
       } catch (e) { window.tiharFetchStore = null; }
