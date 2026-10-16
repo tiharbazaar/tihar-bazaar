@@ -510,7 +510,8 @@
     let selectedCat='सभी', selectedPrice='all', query='', cart=[], activeDetailId=null;
     const whatsappNumber='9779820681800';
     function cartItem(id){return cart.find(item=>item.id===id)}
-    function productName(product){return product.names?.[currentLang]||product.name}
+    function cleanTitle(t){if(!t)return t;return String(t).replace(/^["'\s]+|["'\s]+$/g,'').replace(/\s+/g,' ').trim()}
+    function productName(product){return cleanTitle(product.names?.[currentLang]||product.name)}
     function productMeta(product){if(product.subcat){const key=product.subcat==='चार्जर'?'chargers':product.subcat==='ईयरफोन'?'earphones':'screens';return uiCopy[currentLang][key]+' • '+uiCopy[currentLang].electronics}return product.meta}
     function productTag(product){const tags={hi:{'लोकप्रिय':'लोकप्रिय','नया':'नया','बेस्टसेलर':'बेस्टसेलर'},ne:{'लोकप्रिय':'लोकप्रिय','नया':'नयाँ','बेस्टसेलर':'बेस्टसेलर'},en:{'लोकप्रिय':'Popular','नया':'New','बेस्टसेलर':'Bestseller'}};return tags[currentLang][product.tag]||product.tag}
     function localDigits(value){return currentLang==='ne'?String(value).replace(/\d/g,d=>'०१२३४५६७८९'[d]):String(value)}
