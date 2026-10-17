@@ -112,6 +112,8 @@
     .mf-bottom{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;border-top:1px solid #333;padding:14px 22px;max-width:1200px;margin:auto;font-size:13px}
     .mf-note{text-align:center;font-size:11px;color:#8a8a8a;padding:0 22px 16px;max-width:1200px;margin:auto}
     @media(max-width:760px){.mf-cols{grid-template-columns:repeat(2,1fr);padding:24px 14px}.mf-bottom{justify-content:center;text-align:center}}
+    .see-more-btn{display:block;margin:18px auto 8px;padding:12px 42px;border:2px solid var(--orange);background:#fff;color:var(--orange);font-weight:800;font-size:15px;border-radius:8px;cursor:pointer}
+    .see-more-btn:hover{background:var(--orange);color:#fff}
     .cat-icon-bar{display:flex;gap:4px;overflow-x:auto;background:var(--surface);border-bottom:1px solid var(--line);padding:14px 10px;scrollbar-width:none}
     .cat-icon-bar::-webkit-scrollbar{display:none}
     .cat-icon{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:7px;border:0;background:none;cursor:pointer;padding:4px 8px;min-width:72px;color:var(--ink);font-weight:700;font-size:11px}
@@ -713,7 +715,7 @@ document.getElementById('verifySms').onclick=()=>{const c=uiCopy[currentLang];co
     const grid=document.getElementById('grid'), catEl=document.getElementById('categories'), priceEl=document.getElementById('priceRange');
     var CAT_ICONS=[['fashion','👕'],['cloth','👕'],['mobil','📱'],['phone','📱'],['electron','💻'],['beauty','💄'],['cosmet','💄'],['home','🏠'],['applian','🔌'],['toy','🧸'],['kid','🧸'],['food','🍎'],['groc','🛒'],['sport','⚽'],['furnit','🛋️'],['book','📚'],['lamp','💡'],['light','💡'],['pooja','🪔'],['decor','🎨'],['festiv','🎉'],['diwali','🪔'],['tihar','🪔']];
     function catIconFor(name){var n=(name||'').toLowerCase();for(var i=0;i<CAT_ICONS.length;i++){if(n.indexOf(CAT_ICONS[i][0])!==-1)return CAT_ICONS[i][1];}return '📦';}
-    function renderCatIconBar(){var bar=document.getElementById('catIconBar');if(!bar)return;var all=[['__all__','⭐','For You']];var catList=[['Fashion','👗'],['Mobiles','📱'],['Electronics','⚡'],['Beauty','💄'],['Home','🏠'],['Appliances','❄️'],['Festive','🪔'],['Sports','⚽']];var items=all.concat(catList);bar.innerHTML=items.map(function(it){var key=it[0],icon=it[1],label=key==='__all__'?'For You':it[0];var active=(key==='__all__'?(selectedCat==='सभी'||selectedCat==='All'):selectedCat===key);return '<button type="button" class="cat-icon'+(active?' active':'')+'" data-catkey="'+key+'"><span class="ci">'+icon+'</span><span>'+label+'</span></button>';}).join('');bar.querySelectorAll('.cat-icon').forEach(function(b){b.onclick=function(){var k=b.dataset.catkey;selectedCat=(k==='__all__'?'सभी':k);renderCategories();renderCatIconBar();render();window.scrollTo({top:0,behavior:'smooth'});};});}
+    function renderCatIconBar(){var bar=document.getElementById('catIconBar');if(!bar)return;var all=[['__all__','⭐','For You']];var catList=[['Fashion','👗'],['Mobiles','📱'],['Electronics','⚡'],['Beauty','💄'],['Home','🏠'],['Appliances','❄️'],['Festive','🪔'],['Sports','⚽']];var items=all.concat(catList);bar.innerHTML=items.map(function(it){var key=it[0],icon=it[1],label=key==='__all__'?'For You':it[0];var active=(key==='__all__'?(selectedCat==='सभी'||selectedCat==='All'):selectedCat===key);return '<button type="button" class="cat-icon'+(active?' active':'')+'" data-catkey="'+key+'"><span class="ci">'+icon+'</span><span>'+label+'</span></button>';}).join('');bar.querySelectorAll('.cat-icon').forEach(function(b){b.onclick=function(){var k=b.dataset.catkey;selectedCat=(k==='__all__'?'सभी':k);resetVisible();renderCategories();renderCatIconBar();render();window.scrollTo({top:0,behavior:'smooth'});};});}
     // Render icon bar immediately on page load (with fallback categories)
     try{ renderCatIconBar(); }catch(e){}
     function renderCategories(){try{if(typeof renderCatIconBar==='function')renderCatIconBar();}catch(e){}catEl.innerHTML='';const drawerNav=document.getElementById('catDrawerNav');if(drawerNav)drawerNav.innerHTML='';cats.forEach(([key,labelKey])=>{const label=labelKey?uiCopy[currentLang][labelKey]:key;if(drawerNav){const s=document.createElement('button');s.className=key===selectedCat?'active':'';s.textContent=label;s.onclick=()=>{selectedCat=key;renderCategories();render();closeCatDrawer()};drawerNav.appendChild(s)}})}
@@ -730,14 +732,16 @@ document.addEventListener('DOMContentLoaded',()=>{const mb=document.getElementBy
     let currentSlide=0;const slides=[...document.querySelectorAll('.promo-slide')],dots=[...document.querySelectorAll('.carousel-dot')];
     function showSlide(index){currentSlide=(index+slides.length)%slides.length;slides.forEach((slide,i)=>{const active=i===currentSlide;slide.classList.toggle('active',active);slide.setAttribute('aria-hidden',String(!active))});dots.forEach((dot,i)=>{const active=i===currentSlide;dot.classList.toggle('active',active);if(active)dot.setAttribute('aria-current','true');else dot.removeAttribute('aria-current')})}
     document.getElementById('bannerPrev').onclick=()=>showSlide(currentSlide-1);document.getElementById('bannerNext').onclick=()=>showSlide(currentSlide+1);dots.forEach(dot=>dot.onclick=()=>showSlide(Number(dot.dataset.slideTo)));if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches)setInterval(()=>showSlide(currentSlide+1),6000);
-    document.querySelectorAll('[data-filter],[data-deal]').forEach(el=>el.addEventListener('click',()=>{const cat=el.dataset.filter||el.dataset.deal;if(cat){selectedCat=cat;renderCategories();render()}}));
+    document.querySelectorAll('[data-filter],[data-deal]').forEach(el=>el.addEventListener('click',()=>{const cat=el.dataset.filter||el.dataset.deal;if(cat){selectedCat=cat;resetVisible();renderCategories();render()}}));
     document.querySelectorAll('[data-deal]').forEach(el=>el.addEventListener('click',()=>document.getElementById('products').scrollIntoView({behavior:'smooth'})));
+    let visibleCount=10;
+    function resetVisible(){visibleCount=10;}
     function render(){
       const q=query.trim().toLowerCase(); const list=products.filter(p=>{const catMatch=(selectedCat==='सभी'||selectedCat==='All'||p.cat===selectedCat||p.subcat===selectedCat);if(!catMatch)return false;if(!matchesPrice(p))return false;if(!q)return true;const haystack=[p.name,p.title,p.names&&p.names.hi,p.names&&p.names.ne,p.names&&p.names.en,p.cat,p.category,p.subcat,p.meta,p.description].filter(Boolean).join(' ').toLowerCase();const words=q.split(/\s+/);return words.every(w=>haystack.includes(w));});
       const c=uiCopy[currentLang];document.getElementById('resultCount').textContent=list.length+' '+c.products;
       const showAllCats=(selectedCat==='सभी'||selectedCat==='All')&&!q;
       if(showAllCats&&list.length){
-        const groups={};list.forEach(p=>{const k=p.cat||p.category||'Other';(groups[k]=groups[k]||[]).push(p);});
+        const groups={};list.slice(0,visibleCount).forEach(p=>{const k=p.cat||p.category||'Other';(groups[k]=groups[k]||[]).push(p);});
         grid.innerHTML=Object.keys(groups).sort().map(cat=>{
           const items=groups[cat];
           const cards=items.map((p,i)=>{const inCart=Boolean(cartItem(p.id)),name=productName(p);return `<article class="card" role="button" tabindex="0" data-product-id="${p.id}" aria-label="${c.details}: ${name}"><span class="tag">${productTag(p)}</span>${discountBadge(p)}<div class="img-wrap">${p.img?productPhoto(p,'card'):electronicArt(p,false)}</div><h3 title="${name}">${name}</h3><div class="meta">${productMeta(p)}</div>${ratingMarkup(p)}${priceMarkup(p)}<div class="shipping">${c.shipping}</div><button class="detail-link" type="button" data-detail-id="${p.id}">${c.details} →</button><div class="card-actions"><button class="add ${inCart?'added':''}" type="button" data-id="${p.id}">${inCart?c.added:c.add}</button><button class="buy-now" type="button" data-buy-id="${p.id}">${c.buyNow}</button></div></article>`;}).join('');
@@ -748,16 +752,28 @@ document.addEventListener('DOMContentLoaded',()=>{const mb=document.getElementBy
       grid.querySelectorAll('[data-buy-id]').forEach(b=>b.onclick=()=>openDetail(Number(b.dataset.buyId),true));
       grid.querySelectorAll('.card[data-product-id]').forEach(card=>{card.onclick=e=>{if(e.target.closest('button,a,input,select'))return;openDetail(Number(card.dataset.productId))};card.onkeydown=e=>{if((e.key==='Enter'||e.key===' ')&&!e.target.closest('button,a,input,select')){e.preventDefault();openDetail(Number(card.dataset.productId))}}});
         bindProductImages(grid);
-        grid.querySelectorAll('.cat-see-all').forEach(b=>b.onclick=()=>{selectedCat=b.dataset.cat;renderCategories();render();window.scrollTo({top:0,behavior:'smooth'});});
+        grid.querySelectorAll('.cat-see-all').forEach(b=>b.onclick=()=>{selectedCat=b.dataset.cat;resetVisible();renderCategories();render();window.scrollTo({top:0,behavior:'smooth'});});
         document.getElementById('resultCount').textContent=list.length+' '+c.products;
         return;
       }
-      grid.innerHTML=list.length?list.map((p,i)=>{const inCart=Boolean(cartItem(p.id)),name=productName(p);return `<article class="card" style="animation-delay:${Math.min(i,11)*45}ms" role="button" tabindex="0" data-product-id="${p.id}" aria-label="${c.details}: ${name}"><span class="tag">${productTag(p)}</span>${discountBadge(p)}<div class="img-wrap">${p.img?productPhoto(p,'card'):electronicArt(p,false)}</div><h3 title="${name}">${name}</h3><div class="meta">${productMeta(p)}</div>${ratingMarkup(p)}${priceMarkup(p)}<div class="shipping">${c.shipping}</div><button class="detail-link" type="button" data-detail-id="${p.id}">${c.details} →</button><div class="card-actions"><button class="add ${inCart?'added':''}" type="button" data-id="${p.id}">${inCart?c.added:c.add}</button><button class="buy-now" type="button" data-buy-id="${p.id}">${c.buyNow}</button></div></article>`}).join(''):`<div class="empty">${storeLoading?c.loading:storeError?c.loadFail:c.none}</div>`;
+      grid.innerHTML=list.length?list.slice(0,visibleCount).map((p,i)=>{const inCart=Boolean(cartItem(p.id)),name=productName(p);return `<article class="card" style="animation-delay:${Math.min(i,11)*45}ms" role="button" tabindex="0" data-product-id="${p.id}" aria-label="${c.details}: ${name}"><span class="tag">${productTag(p)}</span>${discountBadge(p)}<div class="img-wrap">${p.img?productPhoto(p,'card'):electronicArt(p,false)}</div><h3 title="${name}">${name}</h3><div class="meta">${productMeta(p)}</div>${ratingMarkup(p)}${priceMarkup(p)}<div class="shipping">${c.shipping}</div><button class="detail-link" type="button" data-detail-id="${p.id}">${c.details} →</button><div class="card-actions"><button class="add ${inCart?'added':''}" type="button" data-id="${p.id}">${inCart?c.added:c.add}</button><button class="buy-now" type="button" data-buy-id="${p.id}">${c.buyNow}</button></div></article>`}).join(''):`<div class="empty">${storeLoading?c.loading:storeError?c.loadFail:c.none}</div>`;
       bindProductImages(grid);
       grid.querySelectorAll('.add').forEach(b=>b.onclick=e=>{flyToCart(e.currentTarget||b);addToCart(Number(b.dataset.id))});
       grid.querySelectorAll('.detail-link').forEach(b=>b.onclick=()=>openDetail(Number(b.dataset.detailId)));
       grid.querySelectorAll('[data-buy-id]').forEach(b=>b.onclick=()=>openDetail(Number(b.dataset.buyId),true));
       grid.querySelectorAll('.card[data-product-id]').forEach(card=>{card.onclick=e=>{if(e.target.closest('button,a,input,select'))return;openDetail(Number(card.dataset.productId))};card.onkeydown=e=>{if((e.key==='Enter'||e.key===' ')&&!e.target.closest('button,a,input,select')){e.preventDefault();openDetail(Number(card.dataset.productId))}}});
+      let seeMore=document.getElementById('seeMoreBtn');
+      if(list.length>visibleCount){
+        if(!seeMore){seeMore=document.createElement('button');seeMore.id='seeMoreBtn';seeMore.type='button';seeMore.className='see-more-btn';grid.parentNode.appendChild(seeMore);}
+        seeMore.style.display='block';
+        seeMore.textContent='See More ('+(list.length-visibleCount)+' more)';
+        seeMore.onclick=()=>{visibleCount+=10;render();window.scrollTo({top:document.getElementById('seeMoreBtn').offsetTop-200,behavior:'smooth'});};
+      }else if(seeMore){seeMore.style.display='none';}
+      // Auto-load 10 more products every 5 seconds
+      clearTimeout(window._autoLoadT);
+      if(list.length>visibleCount){
+        window._autoLoadT=setTimeout(()=>{visibleCount+=10;render();},5000);
+      }
     }
     let detailQuantity=1;
     function detailPhoto(product,thumb){return product.img?productPhoto(product,thumb?'thumb':'detail'):electronicArt(product,false)}
@@ -789,7 +805,7 @@ document.addEventListener('DOMContentLoaded',()=>{const mb=document.getElementBy
       const order=document.getElementById('placeOrderBtn');if(cart.length){order.setAttribute('aria-disabled','false')}else{order.setAttribute('aria-disabled','true')}
     }
     function openDrawer(open){const d=document.getElementById('drawer');d.classList.toggle('open',open);d.setAttribute('aria-hidden',String(!open));document.body.style.overflow=open?'hidden':'';if(open)document.getElementById('close').focus()}
-    priceEl.onchange=e=>{selectedPrice=e.target.value;render()};document.getElementById('search').oninput=e=>{query=e.target.value;if(query.trim())selectedCat='सभी';renderCategories();render()};document.getElementById('cartOpen').onclick=()=>openDrawer(true);document.getElementById('close').onclick=()=>openDrawer(false);
+    priceEl.onchange=e=>{selectedPrice=e.target.value;resetVisible();render()};document.getElementById('search').oninput=e=>{query=e.target.value;if(query.trim())selectedCat='सभी';resetVisible();renderCategories();render()};document.getElementById('cartOpen').onclick=()=>openDrawer(true);document.getElementById('close').onclick=()=>openDrawer(false);
     document.getElementById('placeOrderBtn').onclick=()=>{if(!cart.length)return;openDrawer(false);openOrderModal(cart);};
     document.getElementById('orderClose').onclick=closeOrderModal;
     document.getElementById('orderModal').addEventListener('click',e=>{if(e.target.id==='orderModal')closeOrderModal();});
@@ -853,7 +869,7 @@ document.addEventListener('DOMContentLoaded',()=>{const mb=document.getElementBy
           btn.dataset.active='1'; btn.style.background='#fce4ec';
           const list=(typeof products!=='undefined'?products:[]).filter(p=>wishlist.indexOf(p.id)!==-1);
           const c=uiCopy[currentLang];
-          grid.innerHTML=list.length?list.map((p,i)=>{
+          grid.innerHTML=list.length?list.slice(0,visibleCount).map((p,i)=>{
             const name=(typeof productName==='function'?productName(p):p.name)||'';
             return '<article class="card" style="animation-delay:'+Math.min(i,11)*45+'ms"><div class="img-wrap">'+(p.img&&typeof productPhoto==='function'?productPhoto(p,'card'):'')+'</div><h3>'+name+'</h3><div class="card-actions"><button class="add" type="button" onclick="addToCart(\''+p.id+'\')">'+c.add+'</button></div></article>';
           }).join(''):'<div class="empty"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg><br>'+(currentLang==='en'?'Your wishlist is empty. Tap ❤️ on products to save them.':currentLang==='ne'?'तपाईंको इच्छासूची खाली छ।':'आपकी वishlist खाली है।')+'</div>';
