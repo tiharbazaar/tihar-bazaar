@@ -11,7 +11,7 @@
     </script>
   <meta charset="utf-8" />
 <meta name="google-site-verification" content="JZfcnTOxaN8_t-tEWDu6ckd680vUeJMBLDUza1k3iQA" />
-<title>[CRAZY V3 PREVIEW] Tihar Bazaar - Online Shopping in Nepal | Festival Shopping</title>
+<title>[CRAZY V4 PREVIEW] Tihar Bazaar - Online Shopping in Nepal | Festival Shopping</title>
 <meta name="description" content="Tihar Bazaar - Nepal's festival shopping website. Buy clothes, electronics, home items, Diwali lights & decorations online. Best prices with only 10% margin. Delivery across Nepal." />
 <meta name="keywords" content="Tihar Bazaar, online shopping Nepal, festival shopping, Diwali shopping Nepal, clothes Nepal, electronics Nepal, Janakpur shopping" />
 <meta property="og:title" content="Tihar Bazaar - Online Shopping in Nepal" />
@@ -262,6 +262,60 @@ body{background:radial-gradient(900px 300px at 15% -40px,rgba(255,122,26,.16),tr
 @keyframes v3sk{to{background-position:-200% 0}}
 @media(max-width:760px){.cat-section-grid{grid-template-columns:repeat(2,1fr)!important}.card:hover{transform:none}.card:hover img{transform:none}}
 @media (prefers-reduced-motion: reduce){.v3-strip .track,.buy-now::after,.discount-badge,.spark,.daraz-row .brand-name,.banner-carousel{animation:none!important}.v3-reveal{opacity:1;transform:none;transition:none}}
+</style>
+
+<style id="v4Theme">
+/* ===== CRAZY V4 — aur crazy (v3 ke upar) ===== */
+::selection{background:#ffd43b;color:#231303}
+/* Scroll progress bar */
+#v4bar{position:fixed;top:0;left:0;height:4px;width:0;z-index:2000;background:linear-gradient(90deg,#0e5c42,#ffd43b,#ff7a1a,#ff3d00);border-radius:0 4px 4px 0;box-shadow:0 2px 10px rgba(255,122,26,.6)}
+/* Header shine sweep */
+.topbar{position:relative;overflow:hidden}
+.topbar::after{content:"";position:absolute;top:0;left:-60%;width:35%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.22),transparent);transform:skewX(-18deg);animation:v4sweep 6s ease-in-out infinite;pointer-events:none}
+@keyframes v4sweep{0%,55%{left:-60%}85%,100%{left:130%}}
+/* Marquee 1 bigger */
+.v3-strip{font-size:15px!important}
+.v3-strip .track{padding:11px 0!important}
+/* Marquee 2 (green, reverse) */
+.v4-strip2{overflow:hidden;background:linear-gradient(90deg,#0a4230,#118a4e,#0a4230);color:#ffd43b;font-weight:800;font-size:12.5px;letter-spacing:2.5px;white-space:nowrap}
+.v4-strip2 .track{display:inline-block;padding:7px 0;animation:v3scroll 26s linear infinite reverse}
+/* Category chips: rainbow tints */
+.cat-icon:nth-child(6n+1) .ci{background:linear-gradient(145deg,#eafff4,#d9ffe9)!important}
+.cat-icon:nth-child(6n+2) .ci{background:linear-gradient(145deg,#fff4e0,#ffe9c4)!important}
+.cat-icon:nth-child(6n+3) .ci{background:linear-gradient(145deg,#ffeef6,#ffd9ea)!important}
+.cat-icon:nth-child(6n+4) .ci{background:linear-gradient(145deg,#eef4ff,#d6e6ff)!important}
+.cat-icon:nth-child(6n+5) .ci{background:linear-gradient(145deg,#f3efff,#e2dbff)!important}
+.cat-icon:nth-child(6n) .ci{background:linear-gradient(145deg,#fffbe0,#fff3b0)!important}
+/* Hero orbs (banner ke andar hi maximalism) */
+.promo-slide{position:relative;overflow:hidden}
+.promo-slide::before,.promo-slide::after{content:"";position:absolute;border-radius:50%;pointer-events:none}
+.promo-slide::before{width:300px;height:300px;right:-70px;top:-110px;background:radial-gradient(circle,rgba(255,212,59,.55),rgba(255,212,59,0) 65%);animation:v4orb 7s ease-in-out infinite}
+.promo-slide::after{width:240px;height:240px;left:-60px;bottom:-110px;background:radial-gradient(circle,rgba(255,122,26,.5),rgba(255,122,26,0) 65%);animation:v4orb 9s ease-in-out infinite reverse}
+@keyframes v4orb{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-26px,20px) scale(1.15)}}
+.hero-copy{position:relative;z-index:2}
+/* Headings sparkle marker */
+.cat-section-head h2::before,.section-head h2::before{content:"\2726  ";color:#ff7a1a;-webkit-text-fill-color:#ff7a1a;background:none;font-size:.85em}
+/* Cards: crazy entrance + glow hover + price pop */
+.v3-reveal{transform:translateY(36px) scale(.93) rotate(-1.2deg);transition:opacity .6s ease,transform .6s cubic-bezier(.22,1.6,.36,1)}
+.cat-section-grid .card:nth-child(2),.grid>.card:nth-child(2){transition-delay:.05s}
+.cat-section-grid .card:nth-child(3),.grid>.card:nth-child(3){transition-delay:.1s}
+.cat-section-grid .card:nth-child(4),.grid>.card:nth-child(4){transition-delay:.15s}
+.cat-section-grid .card:nth-child(5),.grid>.card:nth-child(5){transition-delay:.2s}
+.cat-section-grid .card:nth-child(6),.grid>.card:nth-child(6){transition-delay:.25s}
+.cat-section-grid .card:nth-child(7),.grid>.card:nth-child(7){transition-delay:.3s}
+.cat-section-grid .card:nth-child(8),.grid>.card:nth-child(8){transition-delay:.35s}
+.v3-in .price{animation:v4pop .55s cubic-bezier(.34,2,.64,1)}
+@keyframes v4pop{0%{transform:scale(.5)}60%{transform:scale(1.25)}100%{transform:scale(1)}}
+.card:hover{box-shadow:0 26px 48px rgba(14,92,66,.26),0 0 0 2px #ffd43b,0 0 34px rgba(255,122,26,.5)!important}
+.card:hover img{transform:scale(1.15) rotate(-1.5deg)!important}
+.discount-badge{font-size:11.5px!important;padding:5px 9px!important}
+/* Trust icon wiggle */
+.trust-card:hover .trust-icon,.deal-card:hover .trust-icon{animation:v4wig .5s ease}
+@keyframes v4wig{0%,100%{transform:rotate(-4deg)}25%{transform:rotate(10deg) scale(1.15)}75%{transform:rotate(-12deg) scale(1.15)}}
+/* See More glow pulse */
+#seeMoreBtn{animation:v4glow 2.2s ease-in-out infinite}
+@keyframes v4glow{0%,100%{box-shadow:0 12px 28px rgba(14,92,66,.45)}50%{box-shadow:0 12px 38px rgba(255,122,26,.75)}}
+@media (prefers-reduced-motion: reduce){.topbar::after,.promo-slide::before,.promo-slide::after,.v4-strip2 .track,#seeMoreBtn,.v3-in .price{animation:none!important}}
 </style>
 </head>
 <body class="">
@@ -1278,6 +1332,47 @@ document.addEventListener('DOMContentLoaded',()=>{const mb=document.getElementBy
         document.body.appendChild(s);
         var ang=(Math.PI*2*i)/8 + Math.random()*.5, dist=42+Math.random()*38;
         s.animate([{transform:'translate(-50%,-50%) scale(1)',opacity:1},{transform:'translate('+(Math.cos(ang)*dist-8)+'px,'+(Math.sin(ang)*dist-8)+'px) scale(.3)',opacity:0}],{duration:650+Math.random()*250,easing:'cubic-bezier(.22,1,.36,1)'}).onfinish=(function(el){return function(){el.remove();};})(s);
+      }
+    },true);
+  }catch(err){}
+})();
+</script>
+
+<script id="v4Fx">
+(function(){
+  try{
+    // Scroll progress bar
+    var bar=document.createElement('div');bar.id='v4bar';document.body.appendChild(bar);
+    var ticking=false;
+    window.addEventListener('scroll',function(){
+      if(ticking)return;ticking=true;
+      requestAnimationFrame(function(){
+        var h=document.documentElement;
+        var max=h.scrollHeight-h.clientHeight;
+        bar.style.width=(max>0?(h.scrollTop/max)*100:0)+'%';
+        ticking=false;
+      });
+    },{passive:true});
+    // Second marquee (categories, reverse direction)
+    var first=document.querySelector('.v3-strip');
+    if(first&&first.parentNode){
+      var s2=document.createElement('div');s2.className='v4-strip2';
+      var cats='\u2726 FASHION \u2726 MOBILES \u2726 ELECTRONICS \u2726 BEAUTY \u2726 HOME \u2726 APPLIANCES \u2726 FESTIVE \u2726 SPORTS \u2726 TOYS \u2726 GROCERY ';
+      s2.innerHTML='<span class="track">'+cats+cats+cats+cats+'</span>';
+      first.parentNode.insertBefore(s2,first.nextSibling);
+    }
+    // Bigger spark burst on Buy Now
+    var reduced=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    document.addEventListener('click',function(e){
+      var b=e.target.closest?e.target.closest('.buy-now'):null;
+      if(!b||reduced)return;
+      var r=b.getBoundingClientRect();var cx=r.left+r.width/2,cy=r.top+r.height/2;
+      for(var i=0;i<14;i++){
+        var s=document.createElement('span');s.textContent='\u2726';
+        s.style.cssText='position:fixed;z-index:9999;pointer-events:none;color:'+(i%3==0?'#ffd43b':(i%2?'#ff7a1a':'#0e5c42'))+';font-size:'+(11+Math.random()*10)+'px;left:'+cx+'px;top:'+cy+'px';
+        document.body.appendChild(s);
+        var ang=(Math.PI*2*i)/14+Math.random()*.4,dist=55+Math.random()*55;
+        s.animate([{transform:'translate(-50%,-50%) scale(1)',opacity:1},{transform:'translate('+(Math.cos(ang)*dist-8)+'px,'+(Math.sin(ang)*dist-8)+'px) scale(.25)',opacity:0}],{duration:750+Math.random()*300,easing:'cubic-bezier(.22,1,.36,1)'}).onfinish=(function(el){return function(){el.remove();};})(s);
       }
     },true);
   }catch(err){}
