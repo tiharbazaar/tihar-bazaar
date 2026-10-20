@@ -11,7 +11,7 @@
     </script>
   <meta charset="utf-8" />
 <meta name="google-site-verification" content="JZfcnTOxaN8_t-tEWDu6ckd680vUeJMBLDUza1k3iQA" />
-<title>[CRAZY PREVIEW] Tihar Bazaar - Online Shopping in Nepal | Festival Shopping</title>
+<title>[CRAZY V3 PREVIEW] Tihar Bazaar - Online Shopping in Nepal | Festival Shopping</title>
 <meta name="description" content="Tihar Bazaar - Nepal's festival shopping website. Buy clothes, electronics, home items, Diwali lights & decorations online. Best prices with only 10% margin. Delivery across Nepal." />
 <meta name="keywords" content="Tihar Bazaar, online shopping Nepal, festival shopping, Diwali shopping Nepal, clothes Nepal, electronics Nepal, Janakpur shopping" />
 <meta property="og:title" content="Tihar Bazaar - Online Shopping in Nepal" />
@@ -182,48 +182,86 @@
 
   </style>
 
-<style id="crazyTheme">
-/* ===== CRAZY THEME v1 (preview) — brand colors kept: green #0e5c42 / orange / yellow ===== */
-:root{--crazy-grad:linear-gradient(120deg,#0e5c42,#0a4230 40%,#b34700 130%);--crazy-orange:#ff7a1a;--crazy-glow:0 8px 30px rgba(255,122,26,.35)}
-body{background:linear-gradient(180deg,#eafff4 0,#f1f3f6 240px)!important}
-.utilbar{background:linear-gradient(90deg,#07271b,#0e5c42,#07271b)!important}
-.daraz-row,.topbar{background:var(--crazy-grad)!important;box-shadow:0 4px 24px rgba(14,92,66,.45)!important}
-.brand-name,.daraz-row .brand-name{background:linear-gradient(90deg,#fff,#ffd43b,#fff);-webkit-background-clip:text;background-clip:text;color:transparent!important;background-size:200% 100%;animation:crazyShine 4s linear infinite}
-@keyframes crazyShine{to{background-position:200% 0}}
-.daraz-search{border-radius:999px!important;box-shadow:0 0 0 3px rgba(255,212,59,.55),0 10px 24px rgba(0,0,0,.25)!important}
-.crazy-strip{overflow:hidden;background:linear-gradient(90deg,#ff7a1a,#ffb01a,#ff7a1a);color:#fff;font-weight:800;font-size:13px;letter-spacing:.4px;white-space:nowrap;box-shadow:0 3px 14px rgba(255,122,26,.4)}
-.crazy-strip .track{display:inline-block;padding:8px 0;animation:crazyScroll 22s linear infinite}
-@keyframes crazyScroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-.cat-icon-bar{background:rgba(255,255,255,.75)!important;backdrop-filter:blur(12px)}
-.cat-icon .ci{background:linear-gradient(145deg,#eafff4,#fff3e0)!important;box-shadow:0 4px 14px rgba(14,92,66,.18);transition:transform .25s cubic-bezier(.34,1.56,.64,1),box-shadow .25s}
-.cat-icon:hover .ci{transform:translateY(-5px) scale(1.12) rotate(-4deg);box-shadow:var(--crazy-glow)}
-.cat-icon.active .ci{background:linear-gradient(145deg,#ffd43b,#ff7a1a)!important;transform:scale(1.12)}
-.banner-carousel{border-radius:22px!important;overflow:hidden;box-shadow:0 18px 44px rgba(14,92,66,.35)!important}
-.promo-slide{background:linear-gradient(120deg,#0e5c42,#0a4230 55%,#7a3400 140%)!important}
-.promo-slide h1{font-size:clamp(30px,5vw,52px)!important;text-shadow:0 4px 22px rgba(0,0,0,.35)}
-.hero-copy a,.buy-now{background:linear-gradient(90deg,#ffd43b,#ff7a1a)!important;color:#231303!important;border:0!important;box-shadow:var(--crazy-glow);border-radius:999px!important;transition:transform .2s}
-.hero-copy a:hover,.buy-now:hover{transform:translateY(-2px) scale(1.03)}
-.add{border-radius:999px!important;transition:all .2s}
-.add:hover{transform:translateY(-2px)}
-.section{border-radius:20px!important;overflow:hidden;box-shadow:0 10px 34px rgba(23,35,55,.10)!important}
-.section-head h2{background:linear-gradient(90deg,#0e5c42,#ff7a1a);-webkit-background-clip:text;background-clip:text;color:transparent!important}
-.card{transition:transform .3s cubic-bezier(.34,1.4,.64,1),box-shadow .3s;border-radius:14px!important;overflow:hidden;background:#fff}
-.card:hover{transform:translateY(-8px) scale(1.02);box-shadow:0 20px 40px rgba(14,92,66,.22);z-index:2}
-.card .price{font-size:17px!important;color:#e85d00!important}
-.card img{transition:transform .5s}
-.card:hover img{transform:scale(1.08)}
-.discount-badge{background:linear-gradient(90deg,#ff7a1a,#ff3d00)!important;border-radius:999px!important;animation:crazyPulse 1.8s ease-in-out infinite}
-@keyframes crazyPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+<style id="v3Theme">
+/* ===== CRAZY V3 — FULLY CRAZY, winner strategy (Minimal base + Bento + banner Maximalism + Magic/Smooth effects) ===== */
+/* Step-0 fix: category sections full width */
+.cat-section{grid-column:1/-1!important}
+.cat-section-grid{grid-template-columns:repeat(4,1fr)!important}
+/* Base polish (Minimal) */
+body{background:radial-gradient(900px 300px at 15% -40px,rgba(255,122,26,.16),transparent 60%),radial-gradient(900px 300px at 85% -40px,rgba(14,92,66,.16),transparent 60%),#f1f3f6!important}
+.section,.deals,.trust-section,.flow-section{border-radius:22px!important;overflow:hidden;box-shadow:0 14px 38px rgba(23,35,55,.10)!important}
+/* Header: SOLID (no glass), brand shine */
+.topbar,.daraz-row{background:linear-gradient(115deg,#0a4230,#0e5c42 45%,#8a3c00 135%)!important;box-shadow:0 6px 28px rgba(14,92,66,.5)!important}
+.daraz-row .brand-name{background:linear-gradient(90deg,#fff,#ffd43b,#ff7a1a,#fff);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent!important;animation:v3shine 5s linear infinite}
+@keyframes v3shine{to{background-position:250% 0}}
+.daraz-search{border-radius:999px!important;box-shadow:0 0 0 3px rgba(255,212,59,.6),0 10px 24px rgba(0,0,0,.25)!important}
+/* Magic UI: Marquee strip */
+.v3-strip{overflow:hidden;background:linear-gradient(90deg,#ff3d00,#ff7a1a,#ffb01a,#ff7a1a,#ff3d00);background-size:200% 100%;animation:v3stripbg 8s linear infinite;color:#fff;font-weight:800;font-size:13.5px;letter-spacing:.4px;white-space:nowrap;box-shadow:0 4px 18px rgba(255,122,26,.45)}
+.v3-strip .track{display:inline-block;padding:9px 0;animation:v3scroll 20s linear infinite}
+@keyframes v3scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes v3stripbg{to{background-position:200% 0}}
+/* Bento: category bar as chunky bento chips */
+.cat-icon-bar{gap:10px!important;padding:16px 12px!important;background:#fff!important}
+.cat-icon .ci{width:58px;height:58px;border-radius:19px!important;background:linear-gradient(145deg,#eafff4,#fff1de)!important;box-shadow:0 6px 16px rgba(14,92,66,.16);transition:transform .3s cubic-bezier(.34,1.8,.64,1),box-shadow .3s}
+.cat-icon:hover .ci{transform:translateY(-6px) rotate(-6deg) scale(1.13);box-shadow:0 14px 28px rgba(255,122,26,.4)}
+.cat-icon.active .ci{background:linear-gradient(145deg,#ffd43b,#ff7a1a)!important;transform:scale(1.13) rotate(-3deg)}
+/* Bento tiles: deals + trust */
+.deal-grid{gap:12px;padding:14px;background:#fdfdf5}
+.deal-card{border-radius:18px!important;border:2px solid #eef1ea!important;transition:transform .3s cubic-bezier(.34,1.56,.64,1),box-shadow .3s}
+.deal-card:hover{transform:translateY(-6px) scale(1.02);box-shadow:0 16px 32px rgba(14,92,66,.22)}
+.deal-card:nth-child(4n+1){background:linear-gradient(140deg,#eafff4,#ffffff)}
+.deal-card:nth-child(4n+2){background:linear-gradient(140deg,#fff4e0,#ffffff)}
+.deal-card:nth-child(4n+3){background:linear-gradient(140deg,#ffeef6,#ffffff)}
+.deal-card:nth-child(4n){background:linear-gradient(140deg,#eef4ff,#ffffff)}
+.trust-grid{gap:12px;padding:14px;background:#fdfdf5}
+.trust-card{border-radius:18px!important;border:2px solid #eef1ea!important;transition:transform .3s cubic-bezier(.34,1.56,.64,1),box-shadow .3s}
+.trust-card:hover{transform:translateY(-6px);box-shadow:0 16px 32px rgba(255,122,26,.25)}
+.trust-card:nth-child(4n+1){background:linear-gradient(150deg,#eafff4,#fff)}
+.trust-card:nth-child(4n+2){background:linear-gradient(150deg,#fff4e0,#fff)}
+.trust-card:nth-child(4n+3){background:linear-gradient(150deg,#eef4ff,#fff)}
+.trust-card:nth-child(4n){background:linear-gradient(150deg,#ffeef6,#fff)}
+.trust-icon{border-radius:16px!important;transform:rotate(-4deg)}
+/* MAXIMALISM inside banner only */
+.banner-carousel{border-radius:24px!important;padding:3px;background:linear-gradient(120deg,#ffd43b,#ff7a1a,#0e5c42,#ffd43b);background-size:300% 100%;animation:v3stripbg 10s linear infinite;box-shadow:0 22px 50px rgba(14,92,66,.4)!important}
+.promo-slide{border-radius:21px;background:radial-gradient(circle at 85% 20%,rgba(255,212,59,.5),transparent 45%),radial-gradient(circle at 10% 90%,rgba(255,122,26,.45),transparent 50%),linear-gradient(120deg,#0a4230,#0e5c42 55%,#7a3400 150%)!important}
+.promo-slide h1{font-size:clamp(32px,5.2vw,54px)!important;line-height:1.05!important;background:linear-gradient(90deg,#fff,#ffd43b);-webkit-background-clip:text;background-clip:text;color:transparent!important;filter:drop-shadow(0 3px 10px rgba(0,0,0,.35))}
+.spark{animation:v3float 2.6s ease-in-out infinite;font-size:22px!important}
+.spark.s2{animation-delay:.6s}.spark.s3{animation-delay:1.2s}
+@keyframes v3float{0%,100%{transform:translateY(0) rotate(0) scale(1)}50%{transform:translateY(-14px) rotate(35deg) scale(1.35)}}
+/* Headings: gradient + animated underline */
+.section-head h2,.cat-section-head h2,.deals-head h2,.trust-head h2{background:linear-gradient(90deg,#0e5c42,#ff7a1a);-webkit-background-clip:text;background-clip:text;color:transparent!important;position:relative}
+.cat-see-all{border-radius:999px!important;background:linear-gradient(90deg,#0e5c42,#118a4e);color:#fff!important;border:0!important;padding:8px 18px!important;box-shadow:0 8px 20px rgba(14,92,66,.35)}
+/* Cards: SmoothUI motion (transform/opacity only) */
+.card{border-radius:18px!important;transition:transform .38s cubic-bezier(.22,1.4,.36,1),box-shadow .38s;will-change:transform}
+.card:hover{transform:translateY(-9px);box-shadow:0 24px 44px rgba(14,92,66,.24)}
+.card .img-wrap{border-radius:14px!important}
+.card img{transition:transform .5s cubic-bezier(.22,1,.36,1)}
+.card:hover img{transform:scale(1.09) rotate(-1deg)}
+.card .price{font-size:18px!important;color:#e85d00!important;font-weight:800!important}
+/* Discount badge: retro touch, pulse */
+.discount-badge{background:linear-gradient(90deg,#ff7a1a,#ff3d00)!important;border:2px solid #231303!important;border-radius:10px!important;box-shadow:3px 3px 0 #231303;animation:v3pulse 1.7s ease-in-out infinite}
+@keyframes v3pulse{0%,100%{transform:scale(1) rotate(-3deg)}50%{transform:scale(1.12) rotate(2deg)}}
 .tag{border-radius:999px!important}
-.crazy-reveal{opacity:0;transform:translateY(26px) scale(.98);transition:opacity .6s ease,transform .6s cubic-bezier(.22,1,.36,1)}
-.crazy-reveal.crazy-in{opacity:1;transform:none}
-.trust-card,.deal-card{transition:transform .25s,box-shadow .25s}
-.trust-card:hover,.deal-card:hover{transform:translateY(-4px);box-shadow:var(--crazy-glow)}
-#seeMoreBtn{background:linear-gradient(90deg,#0e5c42,#118a4e)!important;color:#fff!important;border-radius:999px!important;box-shadow:0 10px 26px rgba(14,92,66,.4);border:0!important}
-.spark{animation:crazyFloat 3s ease-in-out infinite}
-@keyframes crazyFloat{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-10px) rotate(20deg)}}
-@media(max-width:760px){.card:hover{transform:none}.promo-slide h1{font-size:32px!important}}
-.cat-section{grid-column:1/-1!important}.cat-section-grid{grid-template-columns:repeat(4,1fr)!important}
+/* Buttons: big, solid, labelled + Magic shimmer on Buy Now */
+.card-actions .add,.card-actions .buy-now{padding:13px 6px!important;font-size:13px!important;border-radius:999px!important;position:relative;overflow:hidden}
+.buy-now{background:linear-gradient(90deg,#ffd43b,#ff7a1a)!important;color:#231303!important;border:0!important;box-shadow:0 10px 24px rgba(255,122,26,.45)}
+.buy-now::after{content:"";position:absolute;top:0;left:-70%;width:45%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.75),transparent);transform:skewX(-20deg);animation:v3shimmer 2.8s ease-in-out infinite}
+@keyframes v3shimmer{0%{left:-70%}55%,100%{left:130%}}
+.add{border:2px solid var(--blue)!important;font-weight:800!important;transition:all .25s}
+.add:hover{background:var(--blue)!important;color:#fff!important;transform:translateY(-2px)}
+#seeMoreBtn{background:linear-gradient(90deg,#0e5c42,#118a4e)!important;color:#fff!important;border-radius:999px!important;border:0!important;box-shadow:0 12px 28px rgba(14,92,66,.45);font-size:15px!important;padding:14px 34px!important}
+/* Bottom nav: bigger, solid, labelled */
+.app-bottom-nav{box-shadow:0 -8px 30px rgba(14,92,66,.25)!important;border-top:2px solid rgba(255,212,59,.7)!important}
+.app-bottom-nav a,.app-bottom-nav button{font-weight:800!important}
+/* Reveal animation */
+.v3-reveal{opacity:0;transform:translateY(28px) scale(.97);transition:opacity .55s ease,transform .55s cubic-bezier(.22,1,.36,1)}
+.v3-reveal.v3-in{opacity:1;transform:none}
+/* Skeleton loading (SmoothUI) */
+.v3-skel{border-radius:18px;background:#fff;padding:18px;border:1px solid var(--line)}
+.v3-skel .sk{border-radius:10px;background:linear-gradient(100deg,#eef1ea 40%,#f9faf7 50%,#eef1ea 60%);background-size:200% 100%;animation:v3sk 1.2s linear infinite}
+@keyframes v3sk{to{background-position:-200% 0}}
+@media(max-width:760px){.cat-section-grid{grid-template-columns:repeat(2,1fr)!important}.card:hover{transform:none}.card:hover img{transform:none}}
+@media (prefers-reduced-motion: reduce){.v3-strip .track,.buy-now::after,.discount-badge,.spark,.daraz-row .brand-name,.banner-carousel{animation:none!important}.v3-reveal{opacity:1;transform:none;transition:none}}
 </style>
 </head>
 <body class="">
@@ -1186,22 +1224,63 @@ document.addEventListener('DOMContentLoaded',()=>{const mb=document.getElementBy
   <button type="button" data-nav="account"><span>👤</span><small>Account</small></button>
 </nav>
 
-<script id="crazyFx">
+<script id="v3Fx">
 (function(){
-  // 1) Scrolling offer strip under the header (facts only)
-  var host=document.querySelector('header.topbar')||document.body;
-  var strip=document.createElement('div');strip.className='crazy-strip';
-  var msg='✦ Cash on Delivery ✦ Delivery Across Nepal ✦ Ships in 7–15 Days ✦ Only 10% Margin ✦ WhatsApp +977 9820681800 ✦ ';
-  strip.innerHTML='<span class="track">'+msg+msg+msg+msg+'</span>';
-  if(host&&host.parentNode){host.parentNode.insertBefore(strip,host.nextSibling);}
-  // 2) Scroll-reveal for sections and cards
-  var io=('IntersectionObserver' in window)?new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('crazy-in');io.unobserve(e.target);}});},{threshold:.08}):null;
-  function arm(el){if(!el||el.classList.contains('crazy-reveal'))return;el.classList.add('crazy-reveal');if(io){io.observe(el);}else{el.classList.add('crazy-in');}}
-  function scan(){document.querySelectorAll('.section,.trust-card,.deal-card,.card').forEach(arm);}
-  scan();
-  var mo=new MutationObserver(function(){scan();});
-  var grid=document.getElementById('grid');if(grid){mo.observe(grid,{childList:true});}
-  var main=document.querySelector('main');if(main){mo.observe(main,{childList:true});}
+  try{
+    var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    // 1) Magic UI Marquee
+    var host=document.querySelector('header.topbar')||document.body;
+    var strip=document.createElement('div');strip.className='v3-strip';
+    var msg='\u2726 TIHAR SALE LIVE \u2726 Cash on Delivery \u2726 Delivery Across Nepal \u2726 Ships in 7\u201315 Days \u2726 Only 10% Margin \u2726 WhatsApp +977 9820681800 ';
+    strip.innerHTML='<span class="track">'+msg+msg+msg+msg+'</span>';
+    if(host&&host.parentNode){host.parentNode.insertBefore(strip,host.nextSibling);}
+    var grid=document.getElementById('grid');
+    // 2) Skeleton while products load
+    function addSkeletons(){
+      if(!grid||grid.querySelector('.card')||grid.querySelector('.v3-skel'))return;
+      if(!grid.querySelector('.empty'))return;
+      var html='';
+      for(var i=0;i<8;i++){html+='<div class="v3-skel" aria-hidden="true"><div class="sk" style="height:150px"></div><div class="sk" style="height:16px;margin-top:14px"></div><div class="sk" style="height:16px;width:55%;margin-top:9px"></div><div class="sk" style="height:20px;width:40%;margin-top:12px"></div></div>';}
+      grid.insertAdjacentHTML('beforeend',html);
+    }
+    // 3) Reveal on scroll
+    var io=('IntersectionObserver' in window && !reduced)?new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('v3-in');io.unobserve(e.target);}});},{threshold:.06}):null;
+    function arm(el){if(!el||el.classList.contains('v3-reveal'))return;if(!io){return;}el.classList.add('v3-reveal');io.observe(el);}
+    function scan(){document.querySelectorAll('.card,.trust-card,.deal-card,.cat-section').forEach(arm);addSkeletons();}
+    scan();
+    if(grid){new MutationObserver(function(){scan();}).observe(grid,{childList:true});}
+    // 4) Unlumen-style light tilt — desktop fine pointers only
+    if(window.matchMedia && window.matchMedia('(pointer:fine)').matches && !reduced && grid){
+      var raf=null,current=null;
+      grid.addEventListener('pointermove',function(e){
+        var card=e.target.closest?e.target.closest('.card'):null;
+        if(current&&current!==card){current.style.transform='';current=null;}
+        if(!card)return;current=card;
+        if(raf)return;
+        raf=requestAnimationFrame(function(){
+          raf=null;if(!current)return;
+          var r=current.getBoundingClientRect();
+          var x=(e.clientX-r.left)/r.width-.5, y=(e.clientY-r.top)/r.height-.5;
+          current.style.transform='translateY(-9px) perspective(700px) rotateX('+(-y*5).toFixed(2)+'deg) rotateY('+(x*5).toFixed(2)+'deg)';
+        });
+      });
+      grid.addEventListener('pointerleave',function(){if(current){current.style.transform='';current=null;}});
+    }
+    // 5) Spark burst on Add to Cart (celebration, cheap WAAPI)
+    document.addEventListener('click',function(e){
+      var b=e.target.closest?e.target.closest('.add'):null;
+      if(!b||reduced)return;
+      var r=b.getBoundingClientRect();var cx=r.left+r.width/2, cy=r.top+r.height/2;
+      for(var i=0;i<8;i++){
+        var s=document.createElement('span');
+        s.textContent='\u2726';
+        s.style.cssText='position:fixed;z-index:9999;pointer-events:none;color:'+(i%2?'#ff7a1a':'#0e5c42')+';font-size:'+(10+Math.random()*8)+'px;left:'+cx+'px;top:'+cy+'px';
+        document.body.appendChild(s);
+        var ang=(Math.PI*2*i)/8 + Math.random()*.5, dist=42+Math.random()*38;
+        s.animate([{transform:'translate(-50%,-50%) scale(1)',opacity:1},{transform:'translate('+(Math.cos(ang)*dist-8)+'px,'+(Math.sin(ang)*dist-8)+'px) scale(.3)',opacity:0}],{duration:650+Math.random()*250,easing:'cubic-bezier(.22,1,.36,1)'}).onfinish=(function(el){return function(){el.remove();};})(s);
+      }
+    },true);
+  }catch(err){}
 })();
 </script>
 </body>
